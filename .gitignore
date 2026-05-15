@@ -1,0 +1,50 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+build/
+
+# env files
+.env
+.env.local
+.env.*.local
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+debug.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Vite / cache
+.vite/
+.cache/
+.parcel-cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# testing / coverage
+coverage/
+
+# bundle analyzer output
+stats.html
+
+# temporary files
+*.tmp
+*.temp
+
+# local assets you do not want to commit
+local-assets/
+temp-assets/
