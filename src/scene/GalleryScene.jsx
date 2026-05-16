@@ -1,18 +1,18 @@
-import React from "react";
-import { Text } from "@react-three/drei";
-import { useFrame, useThree } from "@react-three/fiber";
-import * as THREE from "three";
-import CameraRig from "./CameraRig";
-import ExhibitFrame from "./ExhibitFrame";
-import { contactLinks, exhibits } from "../data/exhibits";
+import React from 'react';
+import { Html, Text } from '@react-three/drei';
+import { useFrame, useThree } from '@react-three/fiber';
+import * as THREE from 'three';
+import CameraRig from './CameraRig';
+import ExhibitFrame from './ExhibitFrame';
+import { exhibits } from '../data/exhibits';
 
 function createStoneTexture(color, seed = 1, repeat = [1, 1]) {
-  if (typeof document === "undefined") return null;
+  if (typeof document === 'undefined') return null;
 
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
   canvas.width = 256;
   canvas.height = 256;
-  const context = canvas.getContext("2d");
+  const context = canvas.getContext('2d');
   let value = seed;
   const random = () => {
     value = (value * 1664525 + 1013904223) % 4294967296;
@@ -34,7 +34,14 @@ function createStoneTexture(color, seed = 1, repeat = [1, 1]) {
     context.lineWidth = 0.5 + random() * 1.2;
     context.beginPath();
     context.moveTo(-20, y);
-    context.bezierCurveTo(60, y + random() * 18 - 9, 154, y + random() * 22 - 11, 276, y + random() * 18 - 9);
+    context.bezierCurveTo(
+      60,
+      y + random() * 18 - 9,
+      154,
+      y + random() * 22 - 11,
+      276,
+      y + random() * 18 - 9
+    );
     context.stroke();
   }
 
@@ -49,12 +56,12 @@ function createStoneTexture(color, seed = 1, repeat = [1, 1]) {
 }
 
 function createLightMarbleTexture(seed = 17, repeat = [1, 1]) {
-  if (typeof document === "undefined") return null;
+  if (typeof document === 'undefined') return null;
 
-  const canvas = document.createElement("canvas");
+  const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 512;
-  const context = canvas.getContext("2d");
+  const context = canvas.getContext('2d');
   let value = seed;
   const random = () => {
     value = (value * 1664525 + 1013904223) % 4294967296;
@@ -62,9 +69,9 @@ function createLightMarbleTexture(seed = 17, repeat = [1, 1]) {
   };
 
   const gradient = context.createLinearGradient(0, 0, 0, 512);
-  gradient.addColorStop(0, "#d2c2a6");
-  gradient.addColorStop(0.52, "#eadcc2");
-  gradient.addColorStop(1, "#bda98a");
+  gradient.addColorStop(0, '#d2c2a6');
+  gradient.addColorStop(0.52, '#eadcc2');
+  gradient.addColorStop(1, '#bda98a');
   context.fillStyle = gradient;
   context.fillRect(0, 0, 512, 512);
 
@@ -80,7 +87,14 @@ function createLightMarbleTexture(seed = 17, repeat = [1, 1]) {
     context.lineWidth = 0.6 + random() * 1.2;
     context.beginPath();
     context.moveTo(-40, y);
-    context.bezierCurveTo(120, y + random() * 48 - 24, 326, y + random() * 62 - 31, 552, y + random() * 54 - 27);
+    context.bezierCurveTo(
+      120,
+      y + random() * 48 - 24,
+      326,
+      y + random() * 62 - 31,
+      552,
+      y + random() * 54 - 27
+    );
     context.stroke();
   }
 
@@ -111,9 +125,18 @@ function LightMarbleFloorMaterial() {
   );
 }
 
-function StoneSurfaceMaterial({ color = "#d8cbb8", roughness = 0.94, seed = 1, repeat = [1, 1], side }) {
+function StoneSurfaceMaterial({
+  color = '#d8cbb8',
+  roughness = 0.94,
+  seed = 1,
+  repeat = [1, 1],
+  side,
+}) {
   const [repeatX, repeatY] = repeat;
-  const texture = React.useMemo(() => createStoneTexture(color, seed, [repeatX, repeatY]), [color, seed, repeatX, repeatY]);
+  const texture = React.useMemo(
+    () => createStoneTexture(color, seed, [repeatX, repeatY]),
+    [color, seed, repeatX, repeatY]
+  );
 
   return (
     <meshStandardMaterial
@@ -129,21 +152,33 @@ function StoneSurfaceMaterial({ color = "#d8cbb8", roughness = 0.94, seed = 1, r
   );
 }
 
-function Wall({ position, scale, color = "#d4d4d4", textured = false }) {
+function Wall({ position, scale, color = '#d4d4d4', textured = false }) {
   return (
     <mesh position={position} receiveShadow castShadow>
       <boxGeometry args={scale} />
-      {textured ? <StoneSurfaceMaterial color={color} repeat={[2.4, 8.2]} seed={7} /> : <LimestoneMaterial color={color} />}
+      {textured ? (
+        <StoneSurfaceMaterial color={color} repeat={[2.4, 8.2]} seed={7} />
+      ) : (
+        <LimestoneMaterial color={color} />
+      )}
     </mesh>
   );
 }
 
 function PictureSideLamp({ side, z, intensity = 0.78 }) {
   return (
-    <group position={[side * 5.68, 2.95, z]} rotation={[0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}>
+    <group
+      position={[side * 5.68, 2.95, z]}
+      rotation={[0, side > 0 ? -Math.PI / 2 : Math.PI / 2, 0]}
+    >
       <mesh position={[0, 0, -0.018]} castShadow>
         <circleGeometry args={[0.24, 48]} />
-        <meshStandardMaterial color="#2f251a" roughness={0.44} metalness={0.34} side={THREE.DoubleSide} />
+        <meshStandardMaterial
+          color="#2f251a"
+          roughness={0.44}
+          metalness={0.34}
+          side={THREE.DoubleSide}
+        />
       </mesh>
       <mesh position={[0, 0, 0.018]} castShadow>
         <torusGeometry args={[0.205, 0.017, 12, 56]} />
@@ -174,7 +209,7 @@ function PictureSideLamp({ side, z, intensity = 0.78 }) {
   );
 }
 
-function BronzeMaterial({ color = "#5a432b", roughness = 0.42 }) {
+function BronzeMaterial({ color = '#5a432b', roughness = 0.42 }) {
   return (
     <meshStandardMaterial
       color={color}
@@ -185,7 +220,7 @@ function BronzeMaterial({ color = "#5a432b", roughness = 0.42 }) {
   );
 }
 
-function LimestoneMaterial({ color = "#d8cbb8", roughness = 0.92 }) {
+function LimestoneMaterial({ color = '#d8cbb8', roughness = 0.92 }) {
   return (
     <meshStandardMaterial
       color={color}
@@ -196,25 +231,15 @@ function LimestoneMaterial({ color = "#d8cbb8", roughness = 0.92 }) {
   );
 }
 
-function SlateMaterial({ color = "#202124" }) {
+function SlateMaterial({ color = '#202124' }) {
   return (
-    <meshStandardMaterial
-      color={color}
-      roughness={0.78}
-      metalness={0.06}
-      envMapIntensity={0.18}
-    />
+    <meshStandardMaterial color={color} roughness={0.78} metalness={0.06} envMapIntensity={0.18} />
   );
 }
 
-function DarkWoodMaterial({ color = "#24170f" }) {
+function DarkWoodMaterial({ color = '#24170f' }) {
   return (
-    <meshStandardMaterial
-      color={color}
-      roughness={0.58}
-      metalness={0.035}
-      envMapIntensity={0.26}
-    />
+    <meshStandardMaterial color={color} roughness={0.58} metalness={0.035} envMapIntensity={0.26} />
   );
 }
 
@@ -225,7 +250,7 @@ const facadeSpeckles = Array.from({ length: 90 }, (_, index) => {
     x: -6.65 + column * 0.95 + (row % 2) * 0.16,
     y: 0.68 + row * 0.88,
     scale: [0.12 + (index % 4) * 0.055, 0.008 + (index % 3) * 0.004, 0.004],
-    opacity: 0.024 + (index % 5) * 0.008
+    opacity: 0.024 + (index % 5) * 0.008,
   };
 });
 
@@ -301,7 +326,7 @@ function createPedimentShape(width, height) {
   return shape;
 }
 
-function StoneBlock({ position, scale, rotation = [0, 0, 0], color = "#aaa196" }) {
+function StoneBlock({ position, scale, rotation = [0, 0, 0], color = '#aaa196' }) {
   return (
     <mesh position={position} rotation={rotation} castShadow receiveShadow>
       <boxGeometry args={scale} />
@@ -333,7 +358,7 @@ function Column({ x, height = 3.55 }) {
   );
 }
 
-function Dome({ x = 0, y = 6.34, radius = 1.26, color = "#cfc2ad" }) {
+function Dome({ x = 0, y = 6.34, radius = 1.26, color = '#cfc2ad' }) {
   return (
     <group position={[x, y, 2.9]}>
       <mesh position={[0, -0.12, 0]} castShadow receiveShadow>
@@ -352,7 +377,7 @@ function Dome({ x = 0, y = 6.34, radius = 1.26, color = "#cfc2ad" }) {
   );
 }
 
-function Rosette({ position, scale = 1, color = "#c8b99f" }) {
+function Rosette({ position, scale = 1, color = '#c8b99f' }) {
   return (
     <group position={position} scale={[scale, scale, scale]}>
       <mesh>
@@ -392,9 +417,14 @@ function Hedge({ x, z, width }) {
         <meshStandardMaterial color="#4f5c48" roughness={0.98} />
       </mesh>
       {[-0.42, -0.16, 0.14, 0.4].map((offset) => (
-        <mesh key={offset} position={[offset * width, 0.38, 0.03]} scale={[0.38, 0.22, 0.3]} castShadow>
+        <mesh
+          key={offset}
+          position={[offset * width, 0.38, 0.03]}
+          scale={[0.38, 0.22, 0.3]}
+          castShadow
+        >
           <sphereGeometry args={[0.22, 18, 10]} />
-          <meshStandardMaterial color={offset > 0 ? "#56664f" : "#465541"} roughness={0.98} />
+          <meshStandardMaterial color={offset > 0 ? '#56664f' : '#465541'} roughness={0.98} />
         </mesh>
       ))}
     </group>
@@ -486,12 +516,14 @@ function MansardRoof() {
           <meshBasicMaterial color="#ffffff" transparent opacity={0.045} />
         </mesh>
       ))}
-      {[-6.2, -5.25, -4.3, -3.35, -2.4, -1.45, -0.5, 0.5, 1.45, 2.4, 3.35, 4.3, 5.25, 6.2].map((x, index) => (
-        <mesh key={`slate-h-${x}`} position={[x, 6.08 + (index % 3) * 0.28, 3.2]}>
-          <boxGeometry args={[0.66, 0.012, 0.01]} />
-          <meshBasicMaterial color="#0e0f11" transparent opacity={0.32} />
-        </mesh>
-      ))}
+      {[-6.2, -5.25, -4.3, -3.35, -2.4, -1.45, -0.5, 0.5, 1.45, 2.4, 3.35, 4.3, 5.25, 6.2].map(
+        (x, index) => (
+          <mesh key={`slate-h-${x}`} position={[x, 6.08 + (index % 3) * 0.28, 3.2]}>
+            <boxGeometry args={[0.66, 0.012, 0.01]} />
+            <meshBasicMaterial color="#0e0f11" transparent opacity={0.32} />
+          </mesh>
+        )
+      )}
     </group>
   );
 }
@@ -508,7 +540,12 @@ function FrenchWindow({ x, y, scale = 1, balcony = false }) {
       </mesh>
       <mesh position={[0, 0, 0]} castShadow receiveShadow>
         <shapeGeometry args={[inner]} />
-        <meshStandardMaterial color="#111312" roughness={0.32} metalness={0.34} envMapIntensity={0.45} />
+        <meshStandardMaterial
+          color="#111312"
+          roughness={0.32}
+          metalness={0.34}
+          envMapIntensity={0.45}
+        />
       </mesh>
       <mesh position={[0, -0.04 * scale, 0.025]}>
         <shapeGeometry args={[inner]} />
@@ -564,7 +601,11 @@ function Balcony({ width = 1.12, y = -0.5 }) {
         </mesh>
       ))}
       {[-0.28, 0.28].map((x) => (
-        <mesh key={`curl-${x}`} position={[x * width, -0.04, 0]} rotation={[0, 0, 0.72 * Math.sign(x)]}>
+        <mesh
+          key={`curl-${x}`}
+          position={[x * width, -0.04, 0]}
+          rotation={[0, 0, 0.72 * Math.sign(x)]}
+        >
           <torusGeometry args={[0.08, 0.006, 8, 24, Math.PI * 1.18]} />
           <meshStandardMaterial color="#111111" roughness={0.42} metalness={0.52} />
         </mesh>
@@ -734,7 +775,7 @@ function SkyBackdrop() {
     [4.7, 5.42, 1.9, 0.5],
     [6.15, 5.24, 1.2, 0.32],
     [0.0, 5.9, 2.3, 0.36],
-    [1.72, 5.98, 1.36, 0.28]
+    [1.72, 5.98, 1.36, 0.28],
   ];
 
   return (
@@ -811,7 +852,7 @@ function EntranceStairs() {
     { y: 0.02, z: 4.9, width: 7.2, depth: 0.58 },
     { y: 0.2, z: 4.6, width: 6.55, depth: 0.52 },
     { y: 0.38, z: 4.32, width: 5.9, depth: 0.48 },
-    { y: 0.56, z: 4.06, width: 5.25, depth: 0.42 }
+    { y: 0.56, z: 4.06, width: 5.25, depth: 0.42 },
   ];
 
   return (
@@ -819,7 +860,7 @@ function EntranceStairs() {
       {steps.map((step, index) => (
         <mesh key={index} position={[0, step.y, step.z]} castShadow receiveShadow>
           <boxGeometry args={[step.width, 0.18, step.depth]} />
-          <LimestoneMaterial color={index === 0 ? "#b7ab9c" : "#c5b9a8"} roughness={0.92} />
+          <LimestoneMaterial color={index === 0 ? '#b7ab9c' : '#c5b9a8'} roughness={0.92} />
         </mesh>
       ))}
       <mesh position={[0, 0.58, 4.34]}>
@@ -840,7 +881,7 @@ function MarbleFloor() {
     [-1.8, 6.2, 1.8, 0.28],
     [0.4, 8.2, 1.6, -0.15],
     [2.6, 5.4, 1.4, 0.22],
-    [3.7, 11.6, 1.1, -0.32]
+    [3.7, 11.6, 1.1, -0.32],
   ];
 
   return (
@@ -897,11 +938,21 @@ function FogLayer() {
         [-2.7, 0.08, 7.0, 2.4, 0.45],
         [0.1, 0.1, 6.2, 3.2, 0.52],
         [2.65, 0.08, 7.25, 2.1, 0.42],
-        [-0.8, 0.07, 3.7, 2.5, 0.34]
+        [-0.8, 0.07, 3.7, 2.5, 0.34],
       ].map(([x, y, z, width, opacity], index) => (
-        <mesh key={index} position={[x, y, z]} rotation={[-Math.PI / 2, 0, 0]} scale={[width, 0.42, 1]}>
+        <mesh
+          key={index}
+          position={[x, y, z]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          scale={[width, 0.42, 1]}
+        >
           <circleGeometry args={[1, 32]} />
-          <meshBasicMaterial color="#f4efe5" transparent opacity={opacity * 0.28} depthWrite={false} />
+          <meshBasicMaterial
+            color="#f4efe5"
+            transparent
+            opacity={opacity * 0.28}
+            depthWrite={false}
+          />
         </mesh>
       ))}
     </group>
@@ -1003,7 +1054,13 @@ function PortalGate() {
           <LimestoneMaterial color="#d8ccb9" />
         </mesh>
       ))}
-      <pointLight ref={warmLight} position={[0, 2.25, -0.75]} intensity={1.5} distance={7} color="#f4c277" />
+      <pointLight
+        ref={warmLight}
+        position={[0, 2.25, -0.75]}
+        intensity={1.5}
+        distance={7}
+        color="#f4c277"
+      />
       <mesh position={[0, 2.1, -0.55]}>
         <planeGeometry args={[3.05, 3.15]} />
         <meshBasicMaterial color="#f4c277" transparent opacity={0.22} />
@@ -1078,9 +1135,30 @@ function IntroLobby() {
       <PortalGate />
       <HeroSculpture />
       <FogLayer />
-      <spotLight position={[-3.8, 4.35, 8]} angle={0.36} penumbra={0.62} intensity={3.6} color="#f1c786" castShadow />
-      <spotLight position={[3.8, 4.35, 8]} angle={0.36} penumbra={0.62} intensity={3.3} color="#f1c786" castShadow />
-      <spotLight position={[0, 4.55, 5.5]} angle={0.28} penumbra={0.72} intensity={3.0} color="#f6d7a3" castShadow />
+      <spotLight
+        position={[-3.8, 4.35, 8]}
+        angle={0.36}
+        penumbra={0.62}
+        intensity={3.6}
+        color="#f1c786"
+        castShadow
+      />
+      <spotLight
+        position={[3.8, 4.35, 8]}
+        angle={0.36}
+        penumbra={0.62}
+        intensity={3.3}
+        color="#f1c786"
+        castShadow
+      />
+      <spotLight
+        position={[0, 4.55, 5.5]}
+        angle={0.28}
+        penumbra={0.72}
+        intensity={3.0}
+        color="#f6d7a3"
+        castShadow
+      />
     </group>
   );
 }
@@ -1210,11 +1288,11 @@ function Hallway() {
     return [
       wallZ[0] + gap / 2,
       ...wallZ.slice(0, -1).map((z, index) => (z + wallZ[index + 1]) / 2),
-      wallZ[wallZ.length - 1] - gap / 2
+      wallZ[wallZ.length - 1] - gap / 2,
     ];
   };
-  const leftLampZ = getWallLampZ("left");
-  const rightLampZ = getWallLampZ("right");
+  const leftLampZ = getWallLampZ('left');
+  const rightLampZ = getWallLampZ('right');
   const vaultRibShape = createVaultRibShape();
   const vaultSegments = Array.from({ length: 15 }, (_, index) => {
     const progress = index / 14;
@@ -1225,7 +1303,7 @@ function Hallway() {
       x,
       y: 4.84 + curve * 1.34,
       rotation: -offset * 0.58,
-      color: index % 2 === 0 ? "#d8cbb7" : "#d2c4ae"
+      color: index % 2 === 0 ? '#d8cbb7' : '#d2c4ae',
     };
   });
 
@@ -1248,8 +1326,18 @@ function Hallway() {
         </mesh>
       ))}
 
-      <Wall position={[-6.15, 2.78, hallwayCenterZ]} scale={[0.3, 5.76, hallwayLength]} color="#e6dbc8" textured />
-      <Wall position={[6.15, 2.78, hallwayCenterZ]} scale={[0.3, 5.76, hallwayLength]} color="#e6dbc8" textured />
+      <Wall
+        position={[-6.15, 2.78, hallwayCenterZ]}
+        scale={[0.3, 5.76, hallwayLength]}
+        color="#e6dbc8"
+        textured
+      />
+      <Wall
+        position={[6.15, 2.78, hallwayCenterZ]}
+        scale={[0.3, 5.76, hallwayLength]}
+        color="#e6dbc8"
+        textured
+      />
       {vaultSegments.map((segment, index) => (
         <mesh
           key={`vault-panel-${index}`}
@@ -1258,7 +1346,12 @@ function Hallway() {
           receiveShadow
         >
           <boxGeometry args={[0.92, 0.18, hallwayLength]} />
-          <StoneSurfaceMaterial color={segment.color} roughness={0.95} repeat={[0.9, 7.4]} seed={19 + index} />
+          <StoneSurfaceMaterial
+            color={segment.color}
+            roughness={0.95}
+            repeat={[0.9, 7.4]}
+            seed={19 + index}
+          />
         </mesh>
       ))}
 
@@ -1309,7 +1402,12 @@ function Hallway() {
             <cylinderGeometry args={[0.08, 0.12, 0.08, 22]} />
             <BronzeMaterial color="#4d3a25" roughness={0.38} />
           </mesh>
-          <pointLight position={[0, 5.2, z + 1.65]} intensity={0.39} distance={4.35} color="#e3ad69" />
+          <pointLight
+            position={[0, 5.2, z + 1.65]}
+            intensity={0.39}
+            distance={4.35}
+            color="#e3ad69"
+          />
         </group>
       ))}
 
@@ -1328,27 +1426,369 @@ function Hallway() {
   );
 }
 
+// function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
+//   const plaqueWidth = 3.84;
+//   const plaqueHeight = 3.55;
+//   const links = [
+//     { icon: 'mail', title: 'Email', href: 'mailto:aayush.khunger217@gmail.com' },
+//     {
+//       icon: 'linkedin',
+//       title: 'LinkedIn',
+//       href: 'https://www.linkedin.com/in/aayush-khunger-7024901b1/',
+//     },
+//     { icon: 'github', title: 'GitHub', href: 'https://github.com/Aayush-047' },
+//   ];
+
+//   const handleClick = (href) => {
+//     if (href.startsWith('mailto:')) {
+//       window.location.href = href;
+//     } else {
+//       window.open(href, '_blank', 'noopener,noreferrer');
+//     }
+//   };
+
+//   return (
+//     <group position={position}>
+//       {/* ... all your existing mesh/geometry code stays exactly the same ... */}
+
+//       <mesh position={[0.1, -0.12, -0.08]}>
+//         <boxGeometry args={[plaqueWidth + 0.08, plaqueHeight + 0.08, 0.05]} />
+//         <meshBasicMaterial color="#050302" transparent opacity={0.34} depthWrite={false} />
+//       </mesh>
+
+//       <mesh position={[0, 0, -0.04]}>
+//         <boxGeometry args={[plaqueWidth, plaqueHeight, 0.09]} />
+//         <meshPhysicalMaterial
+//           color="#e6c28b"
+//           transparent
+//           opacity={0.5}
+//           roughness={0.28}
+//           metalness={0.02}
+//           transmission={0.2}
+//           thickness={0.22}
+//           clearcoat={1}
+//           clearcoatRoughness={0.2}
+//           envMapIntensity={0.48}
+//         />
+//       </mesh>
+
+//       <mesh position={[0, 0, 0.015]}>
+//         <boxGeometry args={[plaqueWidth - 0.16, plaqueHeight - 0.16, 0.018]} />
+//         <meshPhysicalMaterial
+//           color="#fff2d6"
+//           transparent
+//           opacity={0.22}
+//           roughness={0.24}
+//           transmission={0.18}
+//           thickness={0.08}
+//           clearcoat={1}
+//           clearcoatRoughness={0.2}
+//           depthWrite={false}
+//         />
+//       </mesh>
+
+//       <mesh position={[0, plaqueHeight / 2 - 0.16, 0.055]}>
+//         <boxGeometry args={[plaqueWidth - 0.42, 0.018, 0.012]} />
+//         <BronzeMaterial color="#c69a4e" roughness={0.24} />
+//       </mesh>
+//       <mesh position={[0, -plaqueHeight / 2 + 0.16, 0.055]}>
+//         <boxGeometry args={[plaqueWidth - 0.42, 0.018, 0.012]} />
+//         <BronzeMaterial color="#c69a4e" roughness={0.26} />
+//       </mesh>
+//       <mesh position={[0, plaqueHeight / 2 - 0.02, 0.09]}>
+//         <boxGeometry args={[plaqueWidth + 0.12, 0.026, 0.016]} />
+//         <BronzeMaterial color="#d4a252" roughness={0.36} />
+//       </mesh>
+//       <mesh position={[0, -plaqueHeight / 2 + 0.02, 0.09]}>
+//         <boxGeometry args={[plaqueWidth + 0.12, 0.026, 0.016]} />
+//         <BronzeMaterial color="#d4a252" roughness={0.36} />
+//       </mesh>
+//       <mesh position={[-plaqueWidth / 2 - 0.06, 0, 0.09]}>
+//         <boxGeometry args={[0.026, plaqueHeight + 0.08, 0.016]} />
+//         <BronzeMaterial color="#d4a252" roughness={0.36} />
+//       </mesh>
+//       <mesh position={[plaqueWidth / 2 + 0.06, 0, 0.09]}>
+//         <boxGeometry args={[0.026, plaqueHeight + 0.08, 0.016]} />
+//         <BronzeMaterial color="#d4a252" roughness={0.36} />
+//       </mesh>
+//       <mesh position={[0, plaqueHeight / 2 - 0.18, 0.104]}>
+//         <boxGeometry args={[plaqueWidth - 0.26, 0.018, 0.014]} />
+//         <BronzeMaterial color="#f0c978" roughness={0.34} />
+//       </mesh>
+//       <mesh position={[0, -plaqueHeight / 2 + 0.18, 0.104]}>
+//         <boxGeometry args={[plaqueWidth - 0.26, 0.018, 0.014]} />
+//         <BronzeMaterial color="#f0c978" roughness={0.34} />
+//       </mesh>
+//       <mesh position={[-plaqueWidth / 2 + 0.18, 0, 0.104]}>
+//         <boxGeometry args={[0.018, plaqueHeight - 0.28, 0.014]} />
+//         <BronzeMaterial color="#f0c978" roughness={0.34} />
+//       </mesh>
+//       <mesh position={[plaqueWidth / 2 - 0.18, 0, 0.104]}>
+//         <boxGeometry args={[0.018, plaqueHeight - 0.28, 0.014]} />
+//         <BronzeMaterial color="#f0c978" roughness={0.34} />
+//       </mesh>
+
+//       {[
+//         [-1.68, 1.46],
+//         [1.68, 1.46],
+//         [-1.68, -1.46],
+//         [1.68, -1.46],
+//       ].map(([x, y]) => (
+//         <group
+//           key={`contact-mount-${x}-${y}`}
+//           position={[x, y, 0.07]}
+//           rotation={[Math.PI / 2, 0, 0]}
+//         >
+//           <mesh>
+//             <cylinderGeometry args={[0.045, 0.045, 0.012, 28]} />
+//             <meshStandardMaterial
+//               color="#201711"
+//               roughness={0.28}
+//               metalness={0.3}
+//               envMapIntensity={0.38}
+//             />
+//           </mesh>
+//         </group>
+//       ))}
+
+//       <Text
+//         position={[0, 0.74, 0.095]}
+//         fontSize={0.3}
+//         maxWidth={3.0}
+//         textAlign="center"
+//         anchorX="center"
+//         anchorY="middle"
+//         color="#d9ad61"
+//         fontWeight={850}
+//       >
+//         Let's Connect
+//       </Text>
+
+//       {/* KEY FIX: removed `transform` prop and added explicit pointerEvents style */}
+//       <group position={[0, -0.08, 0]}>
+//         <Html
+//           center
+//           position={[0, 0, 0.14]}
+//           distanceFactor={4.6}
+//           className="contact-link-layer"
+//           style={{ pointerEvents: 'auto' }}
+//           zIndexRange={[100, 0]}
+//         >
+//           <div
+//             className="contact-link-grid"
+//             style={{
+//               display: 'flex',
+//               gap: '24px',
+//               alignItems: 'center',
+//               justifyContent: 'center',
+//               pointerEvents: 'auto',
+//             }}
+//           >
+//             {links.map((link) => (
+//               <button
+//                 key={link.title}
+//                 onClick={() => handleClick(link.href)}
+//                 aria-label={link.title}
+//                 style={{
+//                   background: 'rgba(30, 20, 10, 0.72)',
+//                   border: '1.5px solid #c69a4e',
+//                   borderRadius: '50%',
+//                   width: '64px',
+//                   height: '64px',
+//                   display: 'flex',
+//                   alignItems: 'center',
+//                   justifyContent: 'center',
+//                   cursor: 'pointer',
+//                   pointerEvents: 'auto',
+//                   color: '#d9ad61',
+//                   fontSize: '22px',
+//                   fontWeight: 700,
+//                   fontFamily: 'sans-serif',
+//                   transition: 'background 0.2s, border-color 0.2s',
+//                   outline: 'none',
+//                 }}
+//                 onMouseEnter={(e) => {
+//                   e.currentTarget.style.background = 'rgba(198, 154, 78, 0.28)';
+//                   e.currentTarget.style.borderColor = '#f0c978';
+//                 }}
+//                 onMouseLeave={(e) => {
+//                   e.currentTarget.style.background = 'rgba(30, 20, 10, 0.72)';
+//                   e.currentTarget.style.borderColor = '#c69a4e';
+//                 }}
+//               >
+//                 {link.icon === 'mail' && (
+//                   <svg
+//                     width="28"
+//                     height="28"
+//                     viewBox="0 0 24 24"
+//                     fill="none"
+//                     stroke="#d9ad61"
+//                     strokeWidth="2"
+//                     strokeLinecap="round"
+//                     strokeLinejoin="round"
+//                   >
+//                     <rect x="2" y="4" width="20" height="16" rx="2" />
+//                     <polyline points="2,4 12,13 22,4" />
+//                   </svg>
+//                 )}
+//                 {link.icon === 'linkedin' && (
+//                   <svg width="28" height="28" viewBox="0 0 24 24" fill="#d9ad61">
+//                     <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+//                     <rect x="2" y="9" width="4" height="12" />
+//                     <circle cx="4" cy="4" r="2" />
+//                   </svg>
+//                 )}
+//                 {link.icon === 'github' && (
+//                   <svg width="28" height="28" viewBox="0 0 24 24" fill="#d9ad61">
+//                     <path d="M12 2C6.48 2 2 6.58 2 12.24c0 4.52 2.87 8.35 6.84 9.71.5.09.68-.22.68-.49v-1.9c-2.78.62-3.37-1.22-3.37-1.22-.45-1.19-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.33 9.33 0 0 1 12 6.94c.85 0 1.71.12 2.51.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9v2.82c0 .27.18.59.69.49A10.11 10.11 0 0 0 22 12.24C22 6.58 17.52 2 12 2Z" />
+//                   </svg>
+//                 )}
+//               </button>
+//             ))}
+//           </div>
+//         </Html>
+//       </group>
+//     </group>
+//   );
+// }
+
 function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
   const plaqueWidth = 3.84;
   const plaqueHeight = 3.55;
   const links = [
-    { icon: "mail", title: "Email", href: "mailto:aayush.khunger217@gmail.com" },
-    { icon: "linkedin", title: "LinkedIn", href: "https://www.linkedin.com/in/aayush-khunger-7024901b1/" },
-    { icon: "github", title: "GitHub", href: "https://github.com/Aayush-047" }
+    { icon: 'mail', title: 'Email', href: 'mailto:aayush.khunger217@gmail.com' },
+    {
+      icon: 'linkedin',
+      title: 'LinkedIn',
+      href: 'https://www.linkedin.com/in/aayush-khunger-7024901b1/',
+    },
+    { icon: 'github', title: 'GitHub', href: 'https://github.com/Aayush-047' },
   ];
 
-  function openLink(event, href) {
-    event.stopPropagation();
-    window.open(href, "_blank", "noopener,noreferrer");
-  }
+  const ICONS = {
+    mail: `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#d9ad61" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/></svg>`,
+    linkedin: `<svg width="26" height="26" viewBox="0 0 24 24" fill="#d9ad61"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>`,
+    github: `<svg width="26" height="26" viewBox="0 0 24 24" fill="#d9ad61"><path d="M12 2C6.48 2 2 6.58 2 12.24c0 4.52 2.87 8.35 6.84 9.71.5.09.68-.22.68-.49v-1.9c-2.78.62-3.37-1.22-3.37-1.22-.45-1.19-1.11-1.5-1.11-1.5-.91-.64.07-.63.07-.63 1 .07 1.53 1.06 1.53 1.06.9 1.57 2.35 1.12 2.92.86.09-.67.35-1.12.63-1.38-2.22-.26-4.55-1.14-4.55-5.06 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.71 0 0 .84-.28 2.75 1.05A9.33 9.33 0 0 1 12 6.94c.85 0 1.71.12 2.51.34 1.91-1.33 2.75-1.05 2.75-1.05.55 1.41.2 2.45.1 2.71.64.72 1.03 1.63 1.03 2.75 0 3.93-2.34 4.79-4.57 5.05.36.32.68.94.68 1.9v2.82c0 .27.18.59.69.49A10.11 10.11 0 0 0 22 12.24C22 6.58 17.52 2 12 2Z"/></svg>`,
+  };
+
+  // Refs for the overlay div and anchor group
+  const overlayRef = React.useRef(null);
+  const groupRef = React.useRef(null);
+
+  // Build the overlay imperatively — zero JSX, zero R3F reconciler involvement
+  React.useEffect(() => {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:9999;';
+    document.body.appendChild(overlay);
+    overlayRef.current = overlay;
+
+    const row = document.createElement('div');
+    row.style.cssText =
+      'position:absolute;transform:translate(-50%,-50%) scale(0);opacity:0;display:flex;gap:18px;align-items:center;justify-content:center;pointer-events:none;transition:none;';
+    overlay.appendChild(row);
+
+    links.forEach((link) => {
+      const a = document.createElement('a');
+      a.href = link.href;
+      if (!link.href.startsWith('mailto:')) {
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+      }
+      a.setAttribute('aria-label', link.title);
+      a.style.cssText = [
+        'pointer-events:auto',
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'width:60px',
+        'height:60px',
+        'border-radius:50%',
+        'background:rgba(20,13,6,0.82)',
+        'border:1.5px solid #c69a4e',
+        'cursor:pointer',
+        'text-decoration:none',
+        'transition:background 0.18s,border-color 0.18s,transform 0.18s',
+        'box-shadow:0 2px 16px rgba(0,0,0,0.5)',
+      ].join(';');
+      a.innerHTML = ICONS[link.icon];
+      a.addEventListener('mouseenter', () => {
+        a.style.background = 'rgba(198,154,78,0.22)';
+        a.style.borderColor = '#f0c978';
+        a.style.transform = 'scale(1.12)';
+      });
+      a.addEventListener('mouseleave', () => {
+        a.style.background = 'rgba(20,13,6,0.82)';
+        a.style.borderColor = '#c69a4e';
+        a.style.transform = 'scale(1)';
+      });
+      row.appendChild(a);
+    });
+
+    // Store row ref so useFrame can reposition it
+    overlayRef.current._row = row;
+
+    return () => document.body.removeChild(overlay);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const { camera, size } = useThree();
+
+  useFrame(() => {
+    if (!groupRef.current || !overlayRef.current?._row) return;
+
+    const worldPos = new THREE.Vector3();
+    groupRef.current.getWorldPosition(worldPos);
+
+    const dist = camera.position.distanceTo(worldPos);
+
+    // Scale: 0 at distance 12, full size at distance 4
+    const near = 4;
+    const far = 12;
+    const t = THREE.MathUtils.clamp((far - dist) / (far - near), 0, 1);
+    // Ease in with a curve so it feels natural
+    const scale = t * t * (3 - 2 * t); // smoothstep
+
+    overlayRef.current._row.style.transform = `translate(-50%, -50%) scale(${scale})`;
+    overlayRef.current._row.style.opacity = String(scale);
+
+    if (dist > far) {
+      overlayRef.current._row.style.display = 'none';
+      return;
+    }
+
+    // Cull if behind camera
+    const camDir = new THREE.Vector3();
+    camera.getWorldDirection(camDir);
+    const toPoint = worldPos.clone().sub(camera.position);
+    if (toPoint.dot(camDir) <= 0) {
+      overlayRef.current._row.style.display = 'none';
+      return;
+    }
+
+    worldPos.project(camera);
+    const x = (worldPos.x * 0.5 + 0.5) * size.width;
+    const y = (worldPos.y * -0.5 + 0.5) * size.height;
+
+    const margin = 200;
+    if (x < -margin || x > size.width + margin || y < -margin || y > size.height + margin) {
+      overlayRef.current._row.style.display = 'none';
+      return;
+    }
+
+    overlayRef.current._row.style.display = 'flex';
+    overlayRef.current._row.style.left = `${x}px`;
+    overlayRef.current._row.style.top = `${y}px`;
+  });
 
   return (
     <group position={position}>
+      {/* Invisible anchor — getWorldPosition reads from here */}
+      <group ref={groupRef} position={[0, -0.5, 0.14]} />
+
+      {/* All original 3D geometry unchanged */}
       <mesh position={[0.1, -0.12, -0.08]}>
         <boxGeometry args={[plaqueWidth + 0.08, plaqueHeight + 0.08, 0.05]} />
         <meshBasicMaterial color="#050302" transparent opacity={0.34} depthWrite={false} />
       </mesh>
-
       <mesh position={[0, 0, -0.04]}>
         <boxGeometry args={[plaqueWidth, plaqueHeight, 0.09]} />
         <meshPhysicalMaterial
@@ -1364,7 +1804,6 @@ function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
           envMapIntensity={0.48}
         />
       </mesh>
-
       <mesh position={[0, 0, 0.015]}>
         <boxGeometry args={[plaqueWidth - 0.16, plaqueHeight - 0.16, 0.018]} />
         <meshPhysicalMaterial
@@ -1379,7 +1818,6 @@ function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
           depthWrite={false}
         />
       </mesh>
-
       <mesh position={[0, plaqueHeight / 2 - 0.16, 0.055]}>
         <boxGeometry args={[plaqueWidth - 0.42, 0.018, 0.012]} />
         <BronzeMaterial color="#c69a4e" roughness={0.24} />
@@ -1420,21 +1858,24 @@ function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
         <boxGeometry args={[0.018, plaqueHeight - 0.28, 0.014]} />
         <BronzeMaterial color="#f0c978" roughness={0.34} />
       </mesh>
-
       {[
         [-1.68, 1.46],
         [1.68, 1.46],
         [-1.68, -1.46],
-        [1.68, -1.46]
+        [1.68, -1.46],
       ].map(([x, y]) => (
-        <group key={`contact-mount-${x}-${y}`} position={[x, y, 0.07]} rotation={[Math.PI / 2, 0, 0]}>
+        <group key={`cm-${x}-${y}`} position={[x, y, 0.07]} rotation={[Math.PI / 2, 0, 0]}>
           <mesh>
             <cylinderGeometry args={[0.045, 0.045, 0.012, 28]} />
-            <meshStandardMaterial color="#201711" roughness={0.28} metalness={0.3} envMapIntensity={0.38} />
+            <meshStandardMaterial
+              color="#201711"
+              roughness={0.28}
+              metalness={0.3}
+              envMapIntensity={0.38}
+            />
           </mesh>
         </group>
       ))}
-
       <Text
         position={[0, 0.74, 0.095]}
         fontSize={0.3}
@@ -1445,123 +1886,9 @@ function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
         color="#d9ad61"
         fontWeight={850}
       >
-        Let’s Connect
+        Let's Connect
       </Text>
-
-      <group position={[0, -0.08, 0]}>
-        {links.map((link, index) => {
-          const x = (index - 1) * 0.72;
-
-          return (
-            <group
-              key={link.title}
-              position={[x, 0, 0]}
-              onClick={(event) => openLink(event, link.href)}
-              onPointerOver={(event) => event.stopPropagation()}
-            >
-              <mesh position={[0, 0, 0.085]}>
-                <boxGeometry args={[0.46, 0.46, 0.018]} />
-                <meshPhysicalMaterial
-                  color="#2b1e16"
-                  transparent
-                  opacity={0.82}
-                  roughness={0.32}
-                  clearcoat={0.8}
-                  clearcoatRoughness={0.24}
-                  depthWrite={false}
-                />
-              </mesh>
-              <ContactIcon type={link.icon} />
-            </group>
-          );
-        })}
-      </group>
     </group>
-  );
-}
-
-function ContactIcon({ type }) {
-  const iconColor = "#f1d49a";
-
-  if (type === "mail") {
-    return (
-      <group position={[0, 0, 0.112]}>
-        <mesh position={[0, 0, 0]}>
-          <boxGeometry args={[0.25, 0.16, 0.01]} />
-          <meshBasicMaterial color={iconColor} transparent opacity={0.16} />
-        </mesh>
-        <mesh position={[0, 0.08, 0.006]}>
-          <boxGeometry args={[0.25, 0.018, 0.012]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-        <mesh position={[0, -0.08, 0.006]}>
-          <boxGeometry args={[0.25, 0.018, 0.012]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-        <mesh position={[-0.125, 0, 0.006]}>
-          <boxGeometry args={[0.018, 0.16, 0.012]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-        <mesh position={[0.125, 0, 0.006]}>
-          <boxGeometry args={[0.018, 0.16, 0.012]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-        <mesh position={[-0.055, 0.015, 0.01]} rotation={[0, 0, -0.62]}>
-          <boxGeometry args={[0.15, 0.014, 0.012]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-        <mesh position={[0.055, 0.015, 0.01]} rotation={[0, 0, 0.62]}>
-          <boxGeometry args={[0.15, 0.014, 0.012]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-      </group>
-    );
-  }
-
-  if (type === "github") {
-    return (
-      <group position={[0, -0.005, 0.112]}>
-        <mesh position={[0, 0.012, 0]}>
-          <circleGeometry args={[0.118, 32]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-        <mesh position={[-0.077, 0.088, 0.004]} rotation={[0, 0, -0.36]}>
-          <circleGeometry args={[0.05, 3]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-        <mesh position={[0.077, 0.088, 0.004]} rotation={[0, 0, 0.36]}>
-          <circleGeometry args={[0.05, 3]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-        <mesh position={[0, -0.12, -0.002]}>
-          <boxGeometry args={[0.06, 0.12, 0.012]} />
-          <meshBasicMaterial color={iconColor} />
-        </mesh>
-        <mesh position={[-0.055, -0.055, 0.006]}>
-          <circleGeometry args={[0.014, 12]} />
-          <meshBasicMaterial color="#2b1e16" />
-        </mesh>
-        <mesh position={[0.055, -0.055, 0.006]}>
-          <circleGeometry args={[0.014, 12]} />
-          <meshBasicMaterial color="#2b1e16" />
-        </mesh>
-      </group>
-    );
-  }
-
-  return (
-    <Text
-      position={[0, 0, 0.112]}
-      fontSize={0.16}
-      maxWidth={0.34}
-      textAlign="center"
-      anchorX="center"
-      anchorY="middle"
-      color={iconColor}
-      fontWeight={850}
-    >
-      in
-    </Text>
   );
 }
 
@@ -1576,10 +1903,7 @@ function DomeWindowChamber() {
     () => Array.from({ length: 17 }, (_, index) => 48 + index * 16),
     []
   );
-  const ribs = React.useMemo(
-    () => Array.from({ length: 18 }, (_, index) => 40 + index * 16),
-    []
-  );
+  const ribs = React.useMemo(() => Array.from({ length: 18 }, (_, index) => 40 + index * 16), []);
 
   return (
     <group>
@@ -1610,7 +1934,12 @@ function DomeWindowChamber() {
           <group key={`lower-wall-${angle}`} position={[x, 1.05, z]} rotation={[0, radians, 0]}>
             <mesh receiveShadow>
               <boxGeometry args={[1.08, 1.82, 0.18]} />
-              <StoneSurfaceMaterial color="#e0d3c0" roughness={0.92} repeat={[0.8, 1.4]} seed={61 + angle} />
+              <StoneSurfaceMaterial
+                color="#e0d3c0"
+                roughness={0.92}
+                repeat={[0.8, 1.4]}
+                seed={61 + angle}
+              />
             </mesh>
             <mesh position={[0, 0.88, 0.105]}>
               <boxGeometry args={[1.02, 0.035, 0.026]} />
@@ -1645,7 +1974,13 @@ function DomeWindowChamber() {
             </mesh>
             <mesh position={[0, 0.04, -0.032]}>
               <boxGeometry args={[0.84, 2.22, 0.018]} />
-              <meshBasicMaterial color="#f1c482" transparent opacity={0.04} depthWrite={false} side={THREE.DoubleSide} />
+              <meshBasicMaterial
+                color="#f1c482"
+                transparent
+                opacity={0.04}
+                depthWrite={false}
+                side={THREE.DoubleSide}
+              />
             </mesh>
           </group>
         );
@@ -1657,7 +1992,12 @@ function DomeWindowChamber() {
         const z = chamberCenterZ + Math.cos(radians) * radius;
 
         return (
-          <mesh key={`dome-rib-${angle}`} position={[x, 3.16, z]} rotation={[0, radians, 0]} castShadow>
+          <mesh
+            key={`dome-rib-${angle}`}
+            position={[x, 3.16, z]}
+            rotation={[0, radians, 0]}
+            castShadow
+          >
             <boxGeometry args={[0.1, 3.02, 0.16]} />
             <BronzeMaterial color="#211711" roughness={0.4} />
           </mesh>
@@ -1665,14 +2005,22 @@ function DomeWindowChamber() {
       })}
 
       {[1.15, 2.05, 3.0].map((height, index) => (
-        <mesh key={`lower-ring-${height}`} position={[0, height, chamberCenterZ]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh
+          key={`lower-ring-${height}`}
+          position={[0, height, chamberCenterZ]}
+          rotation={[Math.PI / 2, 0, 0]}
+        >
           <torusGeometry args={[radius - 0.08, index === 2 ? 0.055 : 0.035, 12, 104]} />
-          <BronzeMaterial color={index === 2 ? "#2c2017" : "#7b623d"} roughness={0.46} />
+          <BronzeMaterial color={index === 2 ? '#2c2017' : '#7b623d'} roughness={0.46} />
         </mesh>
       ))}
 
       {[3.42, 4.16, 4.78].map((height, index) => (
-        <mesh key={`glass-roof-ring-${height}`} position={[0, height, chamberCenterZ]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh
+          key={`glass-roof-ring-${height}`}
+          position={[0, height, chamberCenterZ]}
+          rotation={[Math.PI / 2, 0, 0]}
+        >
           <torusGeometry args={[4.15 - index * 0.9, 0.045, 12, 104]} />
           <BronzeMaterial color="#201610" roughness={0.36} />
         </mesh>
@@ -1682,7 +2030,11 @@ function DomeWindowChamber() {
         const radians = THREE.MathUtils.degToRad(angle);
 
         return (
-          <mesh key={`roof-spoke-${angle}`} position={[Math.sin(radians) * 1.95, 4.42, chamberCenterZ + Math.cos(radians) * 1.95]} rotation={[0.42, radians, 0]}>
+          <mesh
+            key={`roof-spoke-${angle}`}
+            position={[Math.sin(radians) * 1.95, 4.42, chamberCenterZ + Math.cos(radians) * 1.95]}
+            rotation={[0.42, radians, 0]}
+          >
             <boxGeometry args={[0.07, 0.08, 4.15]} />
             <BronzeMaterial color="#1d140f" roughness={0.34} />
           </mesh>
@@ -1713,36 +2065,44 @@ function DomeWindowChamber() {
 
       <mesh position={[0, 3.25, chamberCenterZ]}>
         <sphereGeometry args={[4.25, 40, 16, 0, Math.PI * 2, 0, Math.PI / 2]} />
-        <meshBasicMaterial color="#d3a46e" transparent opacity={0.026} side={THREE.BackSide} depthWrite={false} />
+        <meshBasicMaterial
+          color="#d3a46e"
+          transparent
+          opacity={0.026}
+          side={THREE.BackSide}
+          depthWrite={false}
+        />
       </mesh>
     </group>
   );
 }
 
 function ArchedContactNiche() {
+  const upperTrimLift = 0.18;
+
   return (
     <group position={[0, 2.58, 8.45]}>
-      <mesh position={[-2.5, 1.32, 0.04]}>
+      <mesh position={[-2.5, 1.51 + upperTrimLift, 0.04]}>
         <boxGeometry args={[0.052, 1.98, 0.04]} />
         <BronzeMaterial color="#d4a252" roughness={0.36} />
       </mesh>
-      <mesh position={[2.5, 1.32, 0.04]}>
+      <mesh position={[2.5, 1.51 + upperTrimLift, 0.04]}>
         <boxGeometry args={[0.052, 1.98, 0.04]} />
         <BronzeMaterial color="#d4a252" roughness={0.36} />
       </mesh>
-      <mesh position={[0, 2.31, 0.04]}>
+      <mesh position={[0, 2.5 + upperTrimLift, 0.04]}>
         <boxGeometry args={[5.05, 0.052, 0.04]} />
         <BronzeMaterial color="#d4a252" roughness={0.36} />
       </mesh>
-      <mesh position={[-2.22, 1.24, 0.06]}>
+      <mesh position={[-2.22, 1.43 + upperTrimLift, 0.06]}>
         <boxGeometry args={[0.034, 1.92, 0.032]} />
         <BronzeMaterial color="#f0c978" roughness={0.34} />
       </mesh>
-      <mesh position={[2.22, 1.24, 0.06]}>
+      <mesh position={[2.22, 1.43 + upperTrimLift, 0.06]}>
         <boxGeometry args={[0.034, 1.92, 0.032]} />
         <BronzeMaterial color="#f0c978" roughness={0.34} />
       </mesh>
-      <mesh position={[0, 2.2, 0.06]}>
+      <mesh position={[0, 2.39 + upperTrimLift, 0.06]}>
         <boxGeometry args={[4.48, 0.034, 0.032]} />
         <BronzeMaterial color="#f0c978" roughness={0.34} />
       </mesh>
@@ -1846,19 +2206,39 @@ function CentralDomeSculpture() {
       <group ref={sculptureRef} position={[0, 0.56, 0]}>
         <mesh position={[0, 0.24, 0]} rotation={[0.4, 0.2, 0.2]} castShadow>
           <torusKnotGeometry args={[0.42, 0.045, 96, 12]} />
-          <meshStandardMaterial color={hovered ? "#f0dfbd" : "#d8caa8"} roughness={0.52} metalness={0.08} envMapIntensity={0.36} />
+          <meshStandardMaterial
+            color={hovered ? '#f0dfbd' : '#d8caa8'}
+            roughness={0.52}
+            metalness={0.08}
+            envMapIntensity={0.36}
+          />
         </mesh>
         <mesh position={[0, 0.82, 0]} rotation={[Math.PI / 2.8, 0.25, 0]} castShadow>
           <torusGeometry args={[0.62, 0.025, 12, 88]} />
-          <meshStandardMaterial color={hovered ? "#f2e2bd" : "#e0d2ae"} roughness={0.5} metalness={0.08} envMapIntensity={0.34} />
+          <meshStandardMaterial
+            color={hovered ? '#f2e2bd' : '#e0d2ae'}
+            roughness={0.5}
+            metalness={0.08}
+            envMapIntensity={0.34}
+          />
         </mesh>
         <mesh position={[0, 0.82, 0]} rotation={[Math.PI / 2.8, 0.25, Math.PI / 2]} castShadow>
           <torusGeometry args={[0.48, 0.022, 12, 80]} />
-          <meshStandardMaterial color="#c9a360" roughness={0.32} metalness={0.5} envMapIntensity={0.42} />
+          <meshStandardMaterial
+            color="#c9a360"
+            roughness={0.32}
+            metalness={0.5}
+            envMapIntensity={0.42}
+          />
         </mesh>
         <mesh position={[0, 0.82, 0]} castShadow>
           <sphereGeometry args={[0.12, 28, 16]} />
-          <meshStandardMaterial color="#c79b4f" roughness={0.24} metalness={0.62} envMapIntensity={0.48} />
+          <meshStandardMaterial
+            color="#c79b4f"
+            roughness={0.24}
+            metalness={0.62}
+            envMapIntensity={0.48}
+          />
         </mesh>
       </group>
     </group>
@@ -1904,8 +2284,8 @@ function Atrium() {
 export default function GalleryScene() {
   return (
     <>
-      <color attach="background" args={["#17100b"]} />
-      <fog attach="fog" args={["#b9a686", 18, 76]} />
+      <color attach="background" args={['#17100b']} />
+      <fog attach="fog" args={['#b9a686', 18, 76]} />
 
       <ambientLight intensity={0.33} />
 

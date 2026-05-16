@@ -98,4 +98,4 @@ export const exhibits = [
   }
 ];
 
-export const contactLinks = ["Email", "LinkedIn", "GitHub", "Resume"];
+export const contactLinks = ["Email", "LinkedIn", "GitHub"];
