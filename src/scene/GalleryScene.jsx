@@ -111,6 +111,8 @@ function createLightMarbleTexture(seed = 17, repeat = [1, 1]) {
 function LightMarbleFloorMaterial() {
   const marble = React.useMemo(() => createLightMarbleTexture(37, [1.25, 6.8]), []);
 
+  React.useEffect(() => () => marble?.dispose(), [marble]);
+
   return (
     <meshPhysicalMaterial
       color="#e2d2b6"
@@ -137,6 +139,8 @@ function StoneSurfaceMaterial({
     () => createStoneTexture(color, seed, [repeatX, repeatY]),
     [color, seed, repeatX, repeatY]
   );
+
+  React.useEffect(() => () => texture?.dispose(), [texture]);
 
   return (
     <meshStandardMaterial
@@ -946,7 +950,7 @@ function FogLayer() {
           rotation={[-Math.PI / 2, 0, 0]}
           scale={[width, 0.42, 1]}
         >
-          <circleGeometry args={[1, 32]} />
+          <circleGeometry args={[1, 20]} />
           <meshBasicMaterial
             color="#f4efe5"
             transparent

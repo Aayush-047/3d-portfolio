@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { CAMERA_NAV_JUMP_EVENT, getCameraNavTargets } from "../scene/CameraRig";
 
 const cameraTargets = getCameraNavTargets();
@@ -21,6 +21,7 @@ function scrollToProgress(progress) {
 
 export default function Navbar() {
   const [active, setActive] = useState(navTargets[0].label);
+  const activeRef = useRef(navTargets[0].label);
 
   useEffect(() => {
     let frame = 0;
@@ -35,7 +36,11 @@ export default function Navbar() {
             ? item
             : best;
         }, navTargets[0]);
-        setActive(current.label);
+
+        if (activeRef.current !== current.label) {
+          activeRef.current = current.label;
+          setActive(current.label);
+        }
       });
     }
 

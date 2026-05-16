@@ -47,6 +47,130 @@ canvas {
   display: block;
 }
 
+.museum-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.museum-loader--fixed {
+  position: fixed;
+}
+
+.museum-loader__plaque {
+  display: grid;
+  width: min(72vw, 280px);
+  place-items: center;
+  gap: 14px;
+  border: 1px solid rgba(212, 162, 82, 0.42);
+  border-radius: 8px;
+  padding: 22px 24px 20px;
+  background:
+    linear-gradient(180deg, rgba(39, 26, 17, 0.86), rgba(15, 10, 7, 0.78)),
+    radial-gradient(circle at 50% 0%, rgba(240, 201, 120, 0.2), transparent 62%);
+  box-shadow:
+    0 20px 80px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 239, 201, 0.14);
+  color: #f1d49a;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.museum-loader__arch {
+  position: relative;
+  width: 58px;
+  height: 42px;
+  border: 2px solid rgba(240, 201, 120, 0.82);
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+  overflow: hidden;
+}
+
+.museum-loader__arch::before,
+.museum-loader__arch::after {
+  position: absolute;
+  content: "";
+  bottom: 0;
+  width: 2px;
+  height: 21px;
+  background: rgba(240, 201, 120, 0.82);
+}
+
+.museum-loader__arch::before {
+  left: 13px;
+}
+
+.museum-loader__arch::after {
+  right: 13px;
+}
+
+.museum-loader__arch span {
+  position: absolute;
+  left: -28%;
+  top: 0;
+  width: 28%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 239, 188, 0.75), transparent);
+  animation: museum-loader-sweep 1.45s ease-in-out infinite;
+}
+
+.museum-loader__text {
+  font-family: var(--font-heading);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.museum-loader__rail {
+  position: relative;
+  width: 116px;
+  height: 2px;
+  overflow: hidden;
+  background: rgba(198, 154, 78, 0.24);
+}
+
+.museum-loader__rail span {
+  position: absolute;
+  left: -36px;
+  top: 0;
+  width: 36px;
+  height: 2px;
+  background: #f0c978;
+  box-shadow: 0 0 14px rgba(240, 201, 120, 0.72);
+  animation: museum-loader-rail 1.1s ease-in-out infinite;
+}
+
+@keyframes museum-loader-sweep {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(260px);
+  }
+}
+
+@keyframes museum-loader-rail {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(188px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .museum-loader__arch span,
+  .museum-loader__rail span {
+    animation: none;
+  }
+}
+
 .contact-link-layer {
   pointer-events: auto !important;
   z-index: 9999 !important;
@@ -277,12 +401,13 @@ canvas {
 .intro-background__image {
   position: absolute;
   inset: -4%;
-  background-image: url('https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6Im1fNmEwNjAyZjg3OWI0ODE5MWExNmQyYTg0MWNlMGE5Nzk6ZmlsZV8wMDAwMDAwMDBjZjg3MWY1YWE5ZDRmYzc0YjdiYzRmOCIsInRzIjoiMjA1ODciLCJwIjoicHlpIiwiY2lkIjoiMSIsInNpZyI6ImM2ZGEyN2RjZjI4MGQxMzNiMjMyMDI1MTJmYjVmZDMxM2U1MjM3M2I1NzlmYTliMWEwMzBhN2EwZDgzN2FmNDAiLCJ2IjoiMCIsImdpem1vX2lkIjpudWxsLCJjcyI6bnVsbCwiY2RuIjpudWxsLCJmbiI6bnVsbCwiY2QiOm51bGwsImNwIjpudWxsLCJtYSI6bnVsbH0=');
+  background-image: url('/background-image-3d.avif');
   background-size: cover;
   background-position: center center;
   filter: saturate(0.82) contrast(1.05) brightness(0.78);
   transform-origin: center center;
   transition: transform 80ms linear;
+  will-change: transform;
 }
 
 .intro-background__shade {
@@ -363,6 +488,7 @@ canvas {
   pointer-events: auto;
   transition: opacity 80ms linear;
   will-change: transform, opacity;
+  contain: layout paint;
 }
 
 .intro-caption h1 {
@@ -417,6 +543,8 @@ canvas {
   z-index: 5;
   pointer-events: none;
   transform-origin: center bottom;
+  will-change: transform, opacity;
+  contain: layout paint;
   transition:
     transform 80ms linear,
     opacity 80ms linear;
@@ -426,33 +554,24 @@ canvas {
   position: absolute;
   left: 50%;
   bottom: -20%;
-  width: 140vw;
-  height: 50vh;
+  width: 128vw;
+  height: 42vh;
   border-radius: 50%;
   background:
-    radial-gradient(ellipse at 30% 40%, rgba(250, 244, 232, 0.78), transparent 48%),
-    radial-gradient(ellipse at 62% 48%, rgba(233, 222, 204, 0.64), transparent 52%),
-    radial-gradient(ellipse at 48% 70%, rgba(255, 255, 255, 0.36), transparent 54%);
-  filter: blur(28px);
-  transform: translateX(-50%);
+    radial-gradient(ellipse at 30% 42%, rgba(250, 244, 232, 0.66), transparent 50%),
+    radial-gradient(ellipse at 66% 50%, rgba(233, 222, 204, 0.52), transparent 56%);
+  filter: blur(18px);
+  transform: translate3d(-50%, 0, 0);
+  will-change: transform, opacity;
 }
 
 .intro-fog__bank--two {
-  bottom: -8%;
-  width: 115vw;
-  height: 34vh;
-  opacity: 0.7;
-  filter: blur(38px);
-  transform: translateX(-46%);
-}
-
-.intro-fog__bank--three {
-  bottom: 12%;
-  width: 105vw;
-  height: 26vh;
-  opacity: 0.38;
-  filter: blur(48px);
-  transform: translateX(-55%);
+  bottom: 4%;
+  width: 108vw;
+  height: 28vh;
+  opacity: 0.58;
+  filter: blur(24px);
+  transform: translate3d(-48%, 0, 0);
 }
 
 .intro-transition {
@@ -472,7 +591,7 @@ canvas {
   position: fixed;
   top: max(1rem, env(safe-area-inset-top));
   left: 50%;
-  z-index: 40;
+  z-index: 120;
   display: flex;
   gap: 0.2rem;
   align-items: center;
@@ -539,8 +658,8 @@ canvas {
 
 @media (max-width: 640px) {
   .portfolio-nav {
-    top: auto;
-    bottom: max(0.75rem, env(safe-area-inset-bottom));
+    top: max(0.75rem, env(safe-area-inset-top));
+    bottom: auto;
     width: calc(100vw - 1rem);
     justify-content: center;
     overflow-x: auto;

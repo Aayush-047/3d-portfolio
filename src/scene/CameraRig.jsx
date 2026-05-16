@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -26,9 +26,9 @@ const CAMERA_TIMING = {
 // scrollScrub controls ScrollTrigger smoothing. Higher = more delayed cinematic scroll.
 // zoomSpeed, turnSpeed, and holdDuration scale the exhibit segment durations below.
 const CAMERA_SMOOTHING = {
-  positionLerpFactor: 4.2,
-  lookTargetLerpFactor: 2.8,
-  scrollScrub: 1.6,
+  positionLerpFactor: 3.35,
+  lookTargetLerpFactor: 2.35,
+  scrollScrub: 2.15,
   zoomSpeed: 1.2,
   turnSpeed: 1.18,
   holdDuration: CAMERA_TIMING.exhibitHoldDuration
@@ -39,10 +39,48 @@ const CAMERA_FEEL = {
   eyeHeight: 2.25,
   focusHeight: 2.55,
   zoomDistance: 2.65,
+  zoomBackOffset: 0.05,
   rotationAngle: 30,
   centerAisleX: 0,
   atriumZ: -50
 };
+
+const RESPONSIVE_CAMERA_FEEL = {
+  desktop: {
+    zoomDistance: 2.65,
+    zoomBackOffset: 0.05
+  },
+  tablet: {
+    zoomDistance: 3.45,
+    zoomBackOffset: 0.82
+  },
+  mobile: {
+    zoomDistance: 4.15,
+    zoomBackOffset: 1.18
+  }
+};
+
+function getResponsiveCameraFeel() {
+  if (typeof window === "undefined") return RESPONSIVE_CAMERA_FEEL.desktop;
+
+  const width = window.innerWidth;
+
+  if (width <= 640) return RESPONSIVE_CAMERA_FEEL.mobile;
+  if (width <= 1024) return RESPONSIVE_CAMERA_FEEL.tablet;
+
+  return RESPONSIVE_CAMERA_FEEL.desktop;
+}
+
+function getCameraViewportKey() {
+  if (typeof window === "undefined") return "desktop";
+
+  const width = window.innerWidth;
+
+  if (width <= 640) return "mobile";
+  if (width <= 1024) return "tablet";
+
+  return "desktop";
+}
 
 function toState(position, target) {
   return {
@@ -73,10 +111,11 @@ function softTurnTarget(exhibit, cameraZ) {
   return [softX * side, frameY, frameZ];
 }
 
-function createExhibitSegments(exhibit, index) {
+function createExhibitSegments(exhibit, index, cameraFeel = CAMERA_FEEL) {
   const [frameX, frameY, frameZ] = exhibit.position;
   const side = exhibit.side === "left" ? -1 : 1;
-  const focusX = frameX - side * CAMERA_FEEL.zoomDistance;
+  const focusX = frameX - side * cameraFeel.zoomDistance;
+  const focusZ = frameZ + cameraFeel.zoomBackOffset;
   const nextTravelTargetZ = Math.max(frameZ - 8, CAMERA_FEEL.atriumZ);
 
   return [
@@ -98,16 +137,16 @@ function createExhibitSegments(exhibit, index) {
       duration: CAMERA_TIMING.exhibitFocusDuration * CAMERA_SMOOTHING.turnSpeed
     },
     {
-      // 5. exhibit zoom/hold: zoom distance is controlled by CAMERA_FEEL.zoomDistance.
+      // 5. exhibit zoom/hold: responsive zoom distance keeps mobile/tablet farther back.
       label: `${exhibit.id}-zoom-in`,
-      position: [focusX, CAMERA_FEEL.focusHeight, frameZ + 0.05],
+      position: [focusX, CAMERA_FEEL.focusHeight, focusZ],
       target: [frameX, frameY, frameZ],
       duration: CAMERA_TIMING.exhibitFocusDuration * CAMERA_SMOOTHING.zoomSpeed
     },
     {
       // 5. exhibit zoom/hold: hold duration controls readability time.
       label: `${exhibit.id}-read-hold`,
-      position: [focusX, CAMERA_FEEL.focusHeight, frameZ + 0.05],
+      position: [focusX, CAMERA_FEEL.focusHeight, focusZ],
       target: [frameX, frameY, frameZ],
       duration: CAMERA_SMOOTHING.holdDuration,
       ease: "sine.inOut"
@@ -122,7 +161,7 @@ function createExhibitSegments(exhibit, index) {
   ];
 }
 
-function createCameraWaypoints() {
+function createCameraWaypoints(cameraFeel = getResponsiveCameraFeel()) {
   return [
     {
       label: "outside-start",
@@ -151,7 +190,7 @@ function createCameraWaypoints() {
       target: [0, 2.2, -42],
       duration: CAMERA_TIMING.hallwayTravelDuration
     },
-    ...exhibits.flatMap(createExhibitSegments),
+    ...exhibits.flatMap((exhibit, index) => createExhibitSegments(exhibit, index, cameraFeel)),
     {
       // 7. final contact reveal: approach the end wall without passing through it.
       label: "atrium-reveal",
@@ -192,7 +231,11 @@ export function getCameraNavTargets() {
 
 export default function CameraRig() {
   const { camera } = useThree();
-  const waypoints = useMemo(createCameraWaypoints, []);
+  const [viewportKey, setViewportKey] = useState(getCameraViewportKey);
+  const waypoints = useMemo(
+    () => createCameraWaypoints(RESPONSIVE_CAMERA_FEEL[viewportKey]),
+    [viewportKey]
+  );
 
   // ScrollTrigger writes only to this target state. The real camera never snaps to it.
   const targetState = useRef(toState(waypoints[0].position, waypoints[0].target));
@@ -202,6 +245,27 @@ export default function CameraRig() {
   const actualLookTarget = useRef(new THREE.Vector3(...waypoints[0].target));
   const targetPosition = useRef(new THREE.Vector3(...waypoints[0].position));
   const targetLookAt = useRef(new THREE.Vector3(...waypoints[0].target));
+
+  useEffect(() => {
+    let frame = 0;
+
+    function updateViewportKey() {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        setViewportKey((current) => {
+          const next = getCameraViewportKey();
+          return current === next ? current : next;
+        });
+      });
+    }
+
+    window.addEventListener("resize", updateViewportKey);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", updateViewportKey);
+    };
+  }, []);
 
   useEffect(() => {
     const first = waypoints[0];

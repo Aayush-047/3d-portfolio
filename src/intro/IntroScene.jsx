@@ -62,6 +62,7 @@ function createSoftShadowTexture() {
 
 function useIntroProgress() {
   const [progress, setProgress] = useState(0);
+  const progressRef = useRef(0);
 
   useEffect(() => {
     let frame = 0;
@@ -70,7 +71,12 @@ function useIntroProgress() {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
         const distance = window.innerHeight * 2.1;
-        setProgress(THREE.MathUtils.clamp(window.scrollY / distance, 0, 1));
+        const nextProgress = THREE.MathUtils.clamp(window.scrollY / distance, 0, 1);
+
+        if (Math.abs(progressRef.current - nextProgress) > 0.002) {
+          progressRef.current = nextProgress;
+          setProgress(nextProgress);
+        }
       });
     }
 
@@ -123,6 +129,14 @@ function InteractiveSculpture({ progress }) {
     []
   );
   const shadowTexture = useMemo(() => createSoftShadowTexture(), []);
+
+  useEffect(() => {
+    return () => {
+      stoneTexture.dispose();
+      pedestalTexture.dispose();
+      shadowTexture.dispose();
+    };
+  }, [pedestalTexture, shadowTexture, stoneTexture]);
 
   useFrame(({ clock }) => {
     if (!group.current) return;
@@ -269,14 +283,24 @@ function SculptureCanvas({ progress }) {
 
   return (
     <div className="intro-sculpture" style={{ opacity }}>
-      <Canvas camera={{ position: [0, 0.1, 5.35], fov: 38 }} shadows dpr={[1, 1.75]}>
+      <Canvas
+        camera={{ position: [0, 0.1, 5.35], fov: 38, near: 0.2, far: 14 }}
+        shadows="soft"
+        dpr={[1, 1.35]}
+        performance={{ min: 0.5 }}
+        gl={{
+          antialias: false,
+          alpha: true,
+          powerPreference: "high-performance"
+        }}
+      >
         <ambientLight intensity={0.46} color="#f3dfc1" />
         <directionalLight
           position={[-3, 4, 4]}
           intensity={1.12}
           color="#f6d3a4"
           castShadow
-          shadow-mapSize={[1024, 1024]}
+          shadow-mapSize={[512, 512]}
           shadow-radius={5}
         />
         <spotLight
@@ -286,6 +310,7 @@ function SculptureCanvas({ progress }) {
           intensity={1.72}
           color="#eecb93"
           castShadow
+          shadow-mapSize={[512, 512]}
           shadow-radius={6}
         />
         <InteractiveSculpture progress={progress} />
@@ -325,20 +350,19 @@ function IntroCaption({ progress }) {
 }
 
 function RisingFog({ progress }) {
-  const rise = THREE.MathUtils.smoothstep(progress, 0.22, 0.94);
-  const opacity = 0.28 + rise * 0.72;
+  const rise = THREE.MathUtils.smoothstep(progress, 0.24, 0.9);
+  const opacity = 0.22 + rise * 0.62;
 
   return (
     <div
       className="intro-fog"
       style={{
         opacity,
-        transform: `translateY(${(1 - rise) * 54}%) scale(${1 + rise * 0.2})`
+        transform: `translate3d(0, ${(1 - rise) * 46}%, 0) scale(${1 + rise * 0.14})`
       }}
     >
       <div className="intro-fog__bank intro-fog__bank--one" />
       <div className="intro-fog__bank intro-fog__bank--two" />
-      <div className="intro-fog__bank intro-fog__bank--three" />
     </div>
   );
 }
