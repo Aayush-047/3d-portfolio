@@ -2,6 +2,7 @@ import React, { Suspense } from "react";
 import CustomCursor from "./components/CustomCursor";
 import MuseumLoader from "./components/MuseumLoader";
 import Navbar from "./components/Navbar";
+import ScrollPrompt from "./components/ScrollPrompt";
 
 const GalleryCanvas = React.lazy(() => import("./components/GalleryCanvas"));
 const IntroScene = React.lazy(() => import("./intro/IntroScene"));
@@ -60,6 +61,7 @@ export default function App() {
         <IntroScene />
       </Suspense>
       <Navbar />
+      <ScrollPrompt />
       <CustomCursor />
     </main>
   );
