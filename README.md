@@ -27,7 +27,7 @@ A cinematic, scroll-driven 3D portfolio built with React, Vite, Three.js, and Re
 Install dependencies:
 
 ```bash
-npm ci
+npm i
 ```
 
 Run the local dev server:
