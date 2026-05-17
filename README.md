@@ -76,19 +76,3 @@ gzip total:       ~368 KB
 brotli total:     ~315 KB
 largest chunk:    three.js vendor chunk
 ```
-
-For a React Three Fiber portfolio, this is a deployable size. The largest payload is Three.js itself, which is expected for this type of experience.
-
-## Deployment
-
-Netlify is the recommended deployment target because this repo already includes `netlify.toml`, `_headers`, and `_redirects`.
-
-1. Push the repo to GitHub.
-2. In Netlify, create a new site from the repository.
-3. Use these build settings:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-   - Node version: `20`
-4. Deploy.
-
-The Netlify config handles immutable caching for hashed assets, caching for image files, and SPA fallback routing.
