@@ -170,6 +170,11 @@ function FramedArtwork({ accent, hovered = false }) {
   );
 }
 
+const FONTS = {
+  heading: '/fonts/IM-Fell-DW-Pica-SC.ttf',
+  body: '/fonts/EB-Garamond-Regular.ttf'
+};
+
 function Label({
   children,
   position,
@@ -183,6 +188,7 @@ function Label({
   return (
     <Text
       position={[position[0], position[1], CONTENT_Z + 0.03]}
+      font={FONTS.body}
       fontSize={fontSize}
       lineHeight={lineHeight}
       maxWidth={maxWidth}
@@ -207,13 +213,14 @@ function Chip({ label, position, width, fontSize = 0.046, accent }) {
       </mesh>
       <Text
         position={[0.018, 0, CONTENT_Z + 0.055]}
+        font={FONTS.heading}
         fontSize={fontSize}
         maxWidth={width - 0.1}
         textAlign="center"
         anchorX="center"
         anchorY="middle"
         color={PLAQUE_INK}
-        fontWeight={650}
+        fontWeight={700}
       >
         {label}
       </Text>
@@ -256,6 +263,7 @@ function FrameTitle({ title, accent }) {
     <group>
       <Text
         position={[0, 0.72, CONTENT_Z + 0.052]}
+        font={FONTS.heading}
         fontSize={0.148}
         maxWidth={1.54}
         textAlign="center"
@@ -275,6 +283,7 @@ function AboutContent({ exhibit }) {
     <>
       <Text
         position={[0, 0.78, CONTENT_Z + 0.052]}
+        font={FONTS.heading}
         fontSize={0.168}
         maxWidth={1.54}
         textAlign="center"
@@ -287,8 +296,8 @@ function AboutContent({ exhibit }) {
       </Text>
       <Label
         position={[CONTENT_LEFT, -0.09]}
-        fontSize={0.064}
-        lineHeight={1.1}
+        fontSize={0.072}
+        lineHeight={1.12}
         maxWidth={CONTENT_WIDTH}
         color={PLAQUE_BODY}
         fontWeight={600}
@@ -306,6 +315,7 @@ function SkillsContent({ exhibit }) {
     <>
       <Text
         position={[0, 0.78, CONTENT_Z + 0.052]}
+        font={FONTS.heading}
         fontSize={0.168}
         maxWidth={1.54}
         textAlign="center"
@@ -323,7 +333,7 @@ function SkillsContent({ exhibit }) {
           <group key={group.label}>
             <Label
               position={[CONTENT_LEFT, y]}
-              fontSize={0.055}
+              fontSize={0.065}
               lineHeight={1.08}
               maxWidth={skillLabelWidth}
               color="#4a2f16"
@@ -334,7 +344,7 @@ function SkillsContent({ exhibit }) {
             </Label>
             <Label
               position={[CONTENT_LEFT + skillLabelWidth, y]}
-              fontSize={0.055}
+              fontSize={0.065}
               lineHeight={1.08}
               maxWidth={CONTENT_WIDTH - skillLabelWidth}
               color={PLAQUE_BODY}
@@ -359,7 +369,7 @@ function BulletList({ items, startY, gap = 0.142, fontSize = 0.042 }) {
         <group key={item}>
           <Label
             position={[CONTENT_LEFT, startY - index * gap]}
-            fontSize={fontSize}
+            fontSize={fontSize + 0.01}
             lineHeight={1.05}
             maxWidth={markerWidth}
             color={PLAQUE_BODY}
@@ -370,7 +380,7 @@ function BulletList({ items, startY, gap = 0.142, fontSize = 0.042 }) {
           </Label>
           <Label
             position={[CONTENT_LEFT + markerWidth, startY - index * gap]}
-            fontSize={fontSize}
+            fontSize={fontSize + 0.01}
             lineHeight={1.05}
             maxWidth={CONTENT_WIDTH - markerWidth}
             color={PLAQUE_BODY}
@@ -390,7 +400,7 @@ function ExhibitMeta({ exhibit, y, color = PLAQUE_MUTED }) {
     <group>
       <Label
         position={[CONTENT_LEFT, y]}
-        fontSize={0.059}
+        fontSize={0.069}
         maxWidth={CONTENT_WIDTH}
         color={color}
         fontWeight={900}
@@ -399,7 +409,7 @@ function ExhibitMeta({ exhibit, y, color = PLAQUE_MUTED }) {
       </Label>
       <Label
         position={[CONTENT_LEFT, y - 0.13]}
-        fontSize={0.043}
+        fontSize={0.048}
         maxWidth={CONTENT_WIDTH}
         color={color}
         fontWeight={800}
@@ -418,6 +428,7 @@ function ExperienceContent({ exhibit }) {
       {isPrimaryExperience ? (
         <Text
           position={[0, 0.72, CONTENT_Z + 0.052]}
+          font={FONTS.heading}
           fontSize={0.168}
           maxWidth={1.54}
           textAlign="center"
@@ -447,7 +458,7 @@ function ExperienceContent({ exhibit }) {
           <PaperPanel position={[0, -0.96]} scale={[1.42, 0.26]} color="#fff2d6" opacity={0.3} />
           <Label
             position={[CONTENT_LEFT, -0.96]}
-            fontSize={isPrimaryExperience ? 0.04 : 0.039}
+            fontSize={isPrimaryExperience ? 0.045 : 0.042}
             lineHeight={1.08}
             maxWidth={CONTENT_WIDTH}
             color={PLAQUE_INK}
@@ -466,6 +477,7 @@ function CompactExperienceContent({ exhibit }) {
     <>
       <Text
         position={[0, 0.72, CONTENT_Z + 0.052]}
+        font={FONTS.heading}
         fontSize={0.168}
         maxWidth={1.54}
         textAlign="center"
@@ -480,7 +492,7 @@ function CompactExperienceContent({ exhibit }) {
         <group key={section.label}>
           <Label
             position={[CONTENT_LEFT, 0.36 - index * 0.48]}
-            fontSize={0.059}
+            fontSize={0.065}
             lineHeight={1.06}
             maxWidth={CONTENT_WIDTH}
             color="#4a2f16"
@@ -490,7 +502,7 @@ function CompactExperienceContent({ exhibit }) {
           </Label>
           <Label
             position={[CONTENT_LEFT, 0.18 - index * 0.48]}
-            fontSize={0.054}
+            fontSize={0.06}
             lineHeight={1.08}
             maxWidth={CONTENT_WIDTH}
             color={PLAQUE_BODY}

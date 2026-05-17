@@ -384,6 +384,11 @@ function Hallway() {
   );
 }
 
+const FONTS = {
+  heading: '/fonts/IM-Fell-DW-Pica-SC.ttf',
+  body: '/fonts/EB-Garamond-Regular.ttf'
+};
+
 function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
   const plaqueWidth = 3.84;
   const plaqueHeight = 3.55;
@@ -615,6 +620,7 @@ function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
       ))}
       <Text
         position={[0, 0.74, 0.095]}
+        font={FONTS.heading}
         fontSize={0.3}
         maxWidth={3.0}
         textAlign="center"
@@ -752,6 +758,7 @@ function CentralDomeSculpture() {
       </mesh>
       <Text
         position={[0, 0.46, 0.9]}
+        font={FONTS.heading}
         fontSize={0.26}
         maxWidth={0.7}
         textAlign="center"

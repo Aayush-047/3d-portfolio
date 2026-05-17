@@ -61,9 +61,6 @@ export default function ScrollPrompt() {
       }}
     >
       <div className="scroll-prompt__content">
-        <span className="scroll-prompt__text">
-          {progress < 0.05 ? "Scroll to Explore" : "Scroll to see more"}
-        </span>
         <div className="scroll-prompt__icon">
           <div className="scroll-prompt__mouse">
             <div className="scroll-prompt__wheel" />
