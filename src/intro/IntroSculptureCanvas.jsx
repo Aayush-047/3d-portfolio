@@ -127,8 +127,6 @@ function InteractiveSculpture({ progress }) {
   return (
     <group
       ref={group}
-      onPointerOver={handlePointerOver}
-      onPointerOut={handlePointerOut}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
