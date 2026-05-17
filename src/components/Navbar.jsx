@@ -8,7 +8,15 @@ const navItems = [
   { label: "Experience", progress: cameraTargets["reach-vantage"] },
   { label: "Contact", progress: cameraTargets.contact }
 ];
-const navTargets = [{ label: "AK", progress: cameraTargets.home }, ...navItems];
+const navTargets = [
+  { label: "AK", progress: cameraTargets.home },
+  { label: "Who Am I", progress: cameraTargets["who-am-i"] },
+  { label: "Skills", progress: cameraTargets.skills },
+  { label: "Experience", progress: cameraTargets["reach-vantage"] },
+  { label: "Experience", progress: cameraTargets.thoughtclan },
+  { label: "Experience", progress: cameraTargets.myfinfi },
+  { label: "Contact", progress: cameraTargets.contact }
+];
 
 function scrollToProgress(progress) {
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
