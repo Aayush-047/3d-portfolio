@@ -1,93 +1,93 @@
 // Edit this array to change hallway sections, labels, content, colors, or wall placement.
 // side controls which hallway wall the frame appears on: "left" or "right".
-import { exhibitLayout } from "./exhibitLayout";
+import { exhibitLayout } from './exhibitLayout';
 
 export const exhibits = [
   {
     ...exhibitLayout[0],
-    title: "Who Am I",
-    color: "#d1a34f",
-    variant: "about",
+    title: 'Who Am I',
+    color: '#d1a34f',
+    variant: 'about',
     italicTitle: true,
-    body: "I'm a software engineer based in Bengaluru with 2+ years of experience building production-grade applications across fintech, fleet management, and ed-tech domains. I specialize in React, TypeScript, and Node.js, and care deeply about reducing latency, eliminating redundant work, and writing code that scales.\n\nI believe the best engineering is invisible — users shouldn't notice the work, they should just feel the speed, the smoothness, the reliability. That obsession with craft is what drives me to dig deeper than the ticket, question the architecture, and never ship something I wouldn't be proud to maintain."
+    body: "I'm a software engineer based in Bengaluru with 2+ years of experience building production-grade applications across fintech, fleet management, and ed-tech domains. I specialize in React, TypeScript, and Node.js, and care deeply about reducing latency, eliminating redundant work, and writing code that scales.\n\nI believe the best engineering is invisible users shouldn't notice the work, they should just feel the speed, the smoothness, the reliability. That obsession with craft is what drives me to dig deeper than the ticket, question the architecture, and never ship something I wouldn't be proud to maintain.",
   },
   {
     ...exhibitLayout[1],
-    title: "Skills",
-    color: "#c8a96a",
-    variant: "skills",
+    title: 'Skills',
+    color: '#c8a96a',
+    variant: 'skills',
     italicTitle: true,
     groups: [
       {
-        label: "Languages",
-        items: ["javascript", "TypeScript", "Python"]
+        label: 'Languages',
+        items: ['javascript', 'TypeScript', 'Python'],
       },
       {
-        label: "Frontend",
-        items: ["React.js", "React Native", "Redux Toolkit", "Tailwind CSS", "Ant Design"]
+        label: 'Frontend',
+        items: ['React.js', 'React Native', 'Redux Toolkit', 'Tailwind CSS', 'Ant Design'],
       },
       {
-        label: "Backend",
-        items: ["Node.js", "Express.js", "Prisma"]
+        label: 'Backend',
+        items: ['Node.js', 'Express.js', 'Prisma'],
       },
       {
-        label: "Database",
-        items: ["PostgreSQL", "MongoDB"]
+        label: 'Database',
+        items: ['PostgreSQL', 'MongoDB'],
       },
       {
-        label: "Cloud & Tools",
-        items: ["AWS EC2", "S3", "Lambda", "CloudFront", "Docker", "Git", "Azure DevOps", "Jira"]
-      }
-    ]
+        label: 'Cloud & Tools',
+        items: ['AWS EC2', 'S3', 'Lambda', 'CloudFront', 'Docker', 'Git', 'Azure DevOps', 'Jira'],
+      },
+    ],
   },
   {
     ...exhibitLayout[2],
-    title: "Reach Vantage",
-    role: "Software Engineer",
-    period: "Nov 2024 — Present",
-    color: "#d1a34f",
-    variant: "experience",
+    title: 'Reach Vantage',
+    role: 'Software Engineer',
+    period: 'Nov 2024 — Present',
+    color: '#d1a34f',
+    variant: 'experience',
     bullets: [
-      "Built FAMS (Fleet Asset Management System) features for 1000+ fleet assets",
-      "Reduced NEP (New Event Creation Page) API calls from 7–8 to one controlled execution",
-      "Improved event creation latency from ~8s to ~1s",
-      "Built drag-and-drop technician scheduling flows",
-      "Contributed to React Native FAMS implementation",
-      "Migrated legacy HAML dashboards to React"
-    ]
+      'Built FAMS (Fleet Asset Management System) features for 1000+ fleet assets',
+      'Reduced NEP (New Event Creation Page) API calls from 7–8 to one controlled execution',
+      'Improved event creation latency from ~8s to ~1s',
+      'Built drag-and-drop technician scheduling flows',
+      'Contributed to React Native FAMS implementation',
+      'Migrated legacy HAML dashboards to React',
+    ],
   },
   {
     ...exhibitLayout[3],
-    title: "ThoughtClan",
-    role: "Software Engineer",
-    period: "Jul 2023 — Oct 2024",
-    color: "#d1a34f",
-    variant: "experience",
+    title: 'ThoughtClan',
+    role: 'Software Engineer',
+    period: 'Jul 2023 — Oct 2024',
+    color: '#d1a34f',
+    variant: 'experience',
     bullets: [
-      "Built ConnectsU multi-tenant microsite workflows",
-      "Supported users, organizations, and partner roles",
-      "Developed review and moderation features",
-      "Delivered Timbukdo placement dashboard in 4 weeks",
-      "Worked on data visualization for 1M+ records",
-      "Built LFT modules with React, TypeScript, and GraphQL"
-    ]
+      'Built ConnectsU multi-tenant microsite workflows',
+      'Supported users, organizations, and partner roles',
+      'Developed review and moderation features',
+      'Delivered Timbukdo placement dashboard in 4 weeks',
+      'Worked on data visualization for 1M+ records',
+      'Built LFT modules with React, TypeScript, and GraphQL',
+    ],
   },
   {
     ...exhibitLayout[4],
-    title: "Early Work",
-    color: "#d1a34f",
-    variant: "compactExperience",
+    title: 'Early Work',
+    color: '#d1a34f',
+    variant: 'compactExperience',
     sections: [
       {
-        label: "ThoughtClan Internship",
-        text: "Developed frontend components for a tool inventory system using React.js and Tailwind CSS, integrating APIs and managing application state."
+        label: 'ThoughtClan Internship',
+        text: 'Developed frontend components for a tool inventory system using React.js and Tailwind CSS, integrating APIs and managing application state.',
       },
       {
-        label: "MyFinfi Internship",
-        text: "Built and optimized Node.js APIs for financial workflows such as \"Save Now Buy Later\", improving transaction processing and UI responsiveness."
-      }
-    ]
-  }
+        label: 'MyFinfi Internship',
+        text: 'Built and optimized Node.js APIs for financial workflows such as "Save Now Buy Later", improving transaction processing and UI responsiveness.',
+      },
+    ],
+  },
 ];
 
-export const contactLinks = ["Email", "LinkedIn", "GitHub"];
+export const contactLinks = ['Email', 'LinkedIn', 'GitHub'];
