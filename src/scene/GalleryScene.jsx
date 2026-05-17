@@ -59,8 +59,8 @@ function createLightMarbleTexture(seed = 17, repeat = [1, 1]) {
   if (typeof document === 'undefined') return null;
 
   const canvas = document.createElement('canvas');
-  canvas.width = 256;
-  canvas.height = 256;
+  canvas.width = 512;
+  canvas.height = 512;
   const context = canvas.getContext('2d');
   let value = seed;
   const random = () => {
@@ -68,33 +68,37 @@ function createLightMarbleTexture(seed = 17, repeat = [1, 1]) {
     return value / 4294967296;
   };
 
-  const gradient = context.createLinearGradient(0, 0, 0, 256);
-  gradient.addColorStop(0, '#d2c2a6');
-  gradient.addColorStop(0.52, '#eadcc2');
-  gradient.addColorStop(1, '#bda98a');
-  context.fillStyle = gradient;
-  context.fillRect(0, 0, 256, 256);
+  // Base: Warm Italian White
+  context.fillStyle = '#fdfcf8';
+  context.fillRect(0, 0, 512, 512);
 
-  for (let index = 0; index < 420; index += 1) {
-    const tone = 188 + Math.floor(random() * 44);
-    context.fillStyle = `rgba(${tone}, ${tone - 12}, ${tone - 32}, ${0.018 + random() * 0.03})`;
-    context.fillRect(random() * 256, random() * 256, 1 + random() * 2.8, 1 + random() * 2.8);
+  // Subtle clouds
+  for (let i = 0; i < 60; i++) {
+    const x = random() * 512;
+    const y = random() * 512;
+    const size = 120 + random() * 200;
+    const g = context.createRadialGradient(x, y, 0, x, y, size);
+    g.addColorStop(0, 'rgba(238, 232, 218, 0.12)');
+    g.addColorStop(1, 'rgba(255, 255, 255, 0)');
+    context.fillStyle = g;
+    context.fillRect(0, 0, 512, 512);
   }
 
-  for (let index = 0; index < 12; index += 1) {
-    const y = random() * 280 - 10;
-    context.strokeStyle = `rgba(126, 103, 72, ${0.025 + random() * 0.035})`;
-    context.lineWidth = 0.6 + random() * 1.2;
+  // Elegant Veining (Carrara style)
+  context.lineCap = 'round';
+  for (let i = 0; i < 8; i++) {
+    let x = random() * 512;
+    let y = random() * 512;
     context.beginPath();
-    context.moveTo(-40, y);
-    context.bezierCurveTo(
-      60,
-      y + random() * 48 - 24,
-      163,
-      y + random() * 62 - 31,
-      276,
-      y + random() * 54 - 27
-    );
+    context.moveTo(x, y);
+    context.strokeStyle = `rgba(140, 130, 110, ${0.03 + random() * 0.04})`;
+    context.lineWidth = 0.5 + random() * 1.5;
+    
+    for (let j = 0; j < 15; j++) {
+      x += (random() - 0.5) * 80;
+      y += (random() - 0.5) * 60;
+      context.lineTo(x, y);
+    }
     context.stroke();
   }
 
@@ -103,23 +107,25 @@ function createLightMarbleTexture(seed = 17, repeat = [1, 1]) {
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.repeat.set(repeat[0], repeat[1]);
-  texture.anisotropy = 4;
+  texture.anisotropy = 8;
 
   return texture;
 }
 
 function LightMarbleFloorMaterial() {
-  const marble = React.useMemo(() => createLightMarbleTexture(37, [1.25, 6.8]), []);
-
+  const marble = React.useMemo(() => createLightMarbleTexture(42, [3, 12]), []);
   React.useEffect(() => () => marble?.dispose(), [marble]);
 
   return (
-    <meshStandardMaterial
-      color="#e2d2b6"
+    <meshPhysicalMaterial
+      color="#d4b882"
       map={marble}
-      roughness={0.34}
-      metalness={0.015}
-      envMapIntensity={0.34}
+      roughness={0.38}
+      metalness={0.02}
+      reflectivity={0.82}
+      clearcoat={0.72}
+      clearcoatRoughness={0.06}
+      envMapIntensity={0.84}
     />
   );
 }
@@ -261,7 +267,7 @@ function Hallway() {
       x,
       y: 4.84 + curve * 1.34,
       rotation: -offset * 0.58,
-      color: index % 2 === 0 ? '#d8cbb7' : '#d2c4ae',
+      color: index % 2 === 0 ? '#c8bba0' : '#bfb294',
     };
   });
 
@@ -271,28 +277,30 @@ function Hallway() {
         <planeGeometry args={[12, hallwayLength]} />
         <LightMarbleFloorMaterial />
       </mesh>
-      {[-4.5, -2.25, 0, 2.25, 4.5].map((x) => (
-        <mesh key={`wood-long-${x}`} position={[x, -0.052, hallwayCenterZ]}>
-          <boxGeometry args={[0.018, 0.01, hallwayLength - 0.4]} />
-          <meshBasicMaterial color="#8b7658" transparent opacity={0.08} />
-        </mesh>
-      ))}
-      {Array.from({ length: 22 }, (_, index) => -40.5 + index * 2.35).map((z) => (
-        <mesh key={`wood-cross-${z}`} position={[0, -0.05, z]}>
-          <boxGeometry args={[11.4, 0.01, 0.014]} />
-          <meshBasicMaterial color="#8b7658" transparent opacity={0.065} />
-        </mesh>
-      ))}
+
+      {/* Spread Floor fill lights */}
+      <pointLight
+        position={[0, 0.8, hallwayCenterZ + 8]}
+        intensity={0.55}
+        distance={55}
+        color="#c8922a"
+      />
+      <pointLight
+        position={[0, 0.8, hallwayCenterZ - 8]}
+        intensity={0.55}
+        distance={55}
+        color="#c8922a"
+      />
 
       <Wall
         position={[-6.15, 2.78, hallwayCenterZ]}
         scale={[0.3, 5.76, hallwayLength]}
-        color="#e6dbc8"
+        color="#ddd0b8"
       />
       <Wall
         position={[6.15, 2.78, hallwayCenterZ]}
         scale={[0.3, 5.76, hallwayLength]}
-        color="#e6dbc8"
+        color="#ddd0b8"
       />
       {vaultSegments.map((segment, index) => (
         <mesh
@@ -301,7 +309,7 @@ function Hallway() {
           rotation={[0, 0, segment.rotation]}
           receiveShadow
         >
-          <boxGeometry args={[0.92, 0.18, hallwayLength]} />
+          <boxGeometry args={[0.72, 0.18, hallwayLength]} />
           <StoneSurfaceMaterial
             color={segment.color}
             roughness={0.95}
@@ -354,16 +362,25 @@ function Hallway() {
             <extrudeGeometry args={[vaultRibShape, { depth: 0.035, bevelEnabled: false }]} />
             <meshBasicMaterial color="#f0cf8b" transparent opacity={0.045} />
           </mesh>
-          <mesh position={[0, 4.5, z + 1.65]}>
+          <mesh position={[0, 6.05, z + 1.65]}>
             <cylinderGeometry args={[0.08, 0.12, 0.08, 22]} />
             <BronzeMaterial color="#4d3a25" roughness={0.38} />
           </mesh>
+          {/* Lamp glow mesh */}
+          <mesh position={[0, 6.01, z + 1.65]}>
+            <cylinderGeometry args={[0.07, 0.07, 0.01, 16]} />
+            <meshBasicMaterial color="#f0c878" />
+          </mesh>
           {index % 2 === 0 ? (
-            <pointLight
-              position={[0, 5.2, z + 1.65]}
-              intensity={0.34}
-              distance={4.1}
-              color="#e3ad69"
+            <spotLight
+              position={[0, 6.0, z + 1.65]}
+              target-position={[0, 0, z + 1.65]}
+              intensity={0.85}
+              distance={12}
+              angle={0.65}
+              penumbra={0.8}
+              color="#f0c878"
+              castShadow
             />
           ) : null}
         </group>
@@ -850,10 +867,10 @@ function Atrium() {
 export default function GalleryScene() {
   return (
     <>
-      <color attach="background" args={['#17100b']} />
-      <fog attach="fog" args={['#b9a686', 18, 76]} />
+      <color attach="background" args={['#1a110a']} />
+      <fog attach="fog" args={['#251a0a', 20, 72]} />
 
-      <ambientLight intensity={0.33} />
+      <ambientLight intensity={0.36} color="#f0dfc0" />
 
       <Hallway />
       <Atrium />

@@ -89,7 +89,7 @@ function FramedArtwork({ accent, hovered = false }) {
         <meshStandardMaterial
           color={hovered ? accent : PLAQUE_GOLD}
           roughness={0.2}
-          metalness={0.72}
+          metalness={0.85}
           envMapIntensity={0.46}
         />
       </mesh>
