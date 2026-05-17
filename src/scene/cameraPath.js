@@ -33,15 +33,21 @@ const CAMERA_FEEL = {
 export const RESPONSIVE_CAMERA_FEEL = {
   desktop: {
     zoomDistance: 2.65,
-    zoomBackOffset: 0.05
+    zoomBackOffset: 0.05,
+    atriumRevealZ: -29,
+    atriumSettleZ: -35.4
   },
   tablet: {
-    zoomDistance: 3.45,
-    zoomBackOffset: 0.82
+    zoomDistance: 2.65,
+    zoomBackOffset: 0.05,
+    atriumRevealZ: -29,
+    atriumSettleZ: -35.4
   },
   mobile: {
-    zoomDistance: 4.15,
-    zoomBackOffset: 1.18
+    zoomDistance: 2.65,
+    zoomBackOffset: 0.05,
+    atriumRevealZ: -29,
+    atriumSettleZ: -35.4
   }
 };
 
@@ -151,13 +157,13 @@ export function createCameraWaypoints(cameraFeel = getResponsiveCameraFeel()) {
     ...exhibitLayout.flatMap((exhibit, index) => createExhibitSegments(exhibit, index, cameraFeel)),
     {
       label: "atrium-reveal",
-      position: [0, 2.45, -29],
+      position: [0, 2.45, cameraFeel.atriumRevealZ],
       target: [0, 2.45, -42],
       duration: CAMERA_TIMING.finalAtriumRevealDuration
     },
     {
       label: "atrium-settle",
-      position: [0, 2.55, -35.4],
+      position: [0, 2.55, cameraFeel.atriumSettleZ],
       target: [0, 2.45, -42],
       duration: CAMERA_TIMING.finalAtriumRevealDuration * 0.65
     }

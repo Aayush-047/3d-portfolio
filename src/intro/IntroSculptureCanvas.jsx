@@ -193,7 +193,7 @@ export default function IntroSculptureCanvas({ progress }) {
   const opacity = 1 - THREE.MathUtils.smoothstep(progress, 0.76, 0.98);
 
   return (
-    <div className="intro-sculpture" style={{ opacity }}>
+    <div className="intro-sculpture" style={{ opacity, touchAction: "none" }}>
       <Canvas
         camera={{ position: [0, 0.1, 5.35], fov: 38, near: 0.2, far: 14 }}
         shadows={false}

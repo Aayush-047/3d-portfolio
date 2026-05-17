@@ -110,6 +110,13 @@ export default function CameraRig() {
     () => createCameraWaypoints(RESPONSIVE_CAMERA_FEEL[viewportKey]),
     [viewportKey]
   );
+  useEffect(() => {
+    const fovs = { mobile: 85, tablet: 75, desktop: 60 };
+    camera.fov = fovs[viewportKey] || 60;
+    camera.updateProjectionMatrix();
+    invalidate();
+  }, [viewportKey, camera, invalidate]);
+
   const timeline = useMemo(() => buildTimeline(waypoints), [waypoints]);
 
   const targetState = useRef({ ...timeline.first });

@@ -417,9 +417,11 @@ function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
     document.body.appendChild(overlay);
     overlayRef.current = overlay;
 
+    const near = 4;
+    const far = 12;
+
     const row = document.createElement('div');
-    row.style.cssText =
-      'position:absolute;transform:translate(-50%,-50%) scale(0);opacity:0;display:flex;gap:18px;align-items:center;justify-content:center;pointer-events:none;transition:none;';
+    row.style.cssText = `position:absolute;transform:translate(-50%,-50%) scale(0);opacity:0;display:flex;gap:18px;align-items:center;justify-content:center;pointer-events:none;transition:none;`;
     overlay.appendChild(row);
 
     links.forEach((link) => {
@@ -445,6 +447,7 @@ function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
         'transition:background 0.18s,border-color 0.18s,transform 0.18s',
         'box-shadow:0 2px 16px rgba(0,0,0,0.5)',
       ].join(';');
+      
       a.innerHTML = ICONS[link.icon];
       a.addEventListener('mouseenter', () => {
         a.style.background = 'rgba(198,154,78,0.22)';
@@ -475,7 +478,6 @@ function FloatingContactPlaque({ position = [0, 3.15, 8.28] }) {
 
     const dist = camera.position.distanceTo(worldPos);
 
-    // Scale: 0 at distance 12, full size at distance 4
     const near = 4;
     const far = 12;
     const t = THREE.MathUtils.clamp((far - dist) / (far - near), 0, 1);
