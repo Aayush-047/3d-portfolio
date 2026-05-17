@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { CAMERA_NAV_JUMP_EVENT, getCameraNavTargets } from "../scene/CameraRig";
+import { CAMERA_NAV_JUMP_EVENT, getCameraNavTargets } from "../scene/cameraPath";
 
 const cameraTargets = getCameraNavTargets();
 const navItems = [

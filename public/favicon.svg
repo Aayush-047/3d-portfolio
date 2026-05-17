@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-label="AK favicon">
+  <rect width="64" height="64" rx="14" fill="#17100b" />
+  <circle cx="32" cy="32" r="26" fill="none" stroke="#4b3720" stroke-width="2" />
+  <circle cx="32" cy="32" r="22" fill="none" stroke="#d7ad62" stroke-width="1.6" opacity="0.78" />
+  <path
+    d="M12 48 L24 16 L36 48 M18 36 H30 M40 16 V48 M40 32 L53 16 M40 32 L54 48"
+    fill="none"
+    stroke="#d7ad62"
+    stroke-width="4.8"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

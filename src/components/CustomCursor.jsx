@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 const CURSOR_EVENT = "portfolio-cursor";
+const TRAIL_POINTS = 12;
 
 function getCursorTarget(target) {
   return target instanceof Element ? target.closest("[data-cursor]") : null;
@@ -17,8 +18,18 @@ export default function CustomCursor() {
   const dot = useRef({ x: 0, y: 0 });
   const lastTrailPoint = useRef({ x: 0, y: 0 });
   const frame = useRef(0);
+  const stateRef = useRef({ active: false, label: "" });
   const [enabled, setEnabled] = useState(false);
   const [state, setState] = useState({ active: false, label: "" });
+
+  function updateState(nextState) {
+    const current = stateRef.current;
+
+    if (current.active === nextState.active && current.label === nextState.label) return;
+
+    stateRef.current = nextState;
+    setState(nextState);
+  }
 
   useEffect(() => {
     const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
@@ -32,7 +43,7 @@ export default function CustomCursor() {
       dot.current = { x: event.clientX, y: event.clientY };
       ring.current = { x: event.clientX, y: event.clientY };
       lastTrailPoint.current = { x: event.clientX, y: event.clientY };
-      trail.current = Array.from({ length: 30 }, () => ({
+      trail.current = Array.from({ length: TRAIL_POINTS }, () => ({
         x: event.clientX,
         y: event.clientY,
         life: 0,
@@ -48,7 +59,7 @@ export default function CustomCursor() {
         setEnabled(false);
         trail.current = [];
         document.documentElement.classList.remove("custom-cursor-enabled");
-        setState({ active: false, label: "" });
+        updateState({ active: false, label: "" });
         window.addEventListener("pointermove", enableOnPointer, { passive: true });
       }
     }
@@ -65,24 +76,24 @@ export default function CustomCursor() {
           x: event.clientX,
           y: event.clientY,
           life: 1,
-          size: state.active ? 24 : 18
+          size: stateRef.current.active ? 24 : 18
         });
         lastTrailPoint.current = { x: event.clientX, y: event.clientY };
       }
 
       const target = getCursorTarget(event.target);
-      setState({
+      updateState({
         active: Boolean(target),
         label: target?.dataset.cursor ?? ""
       });
     }
 
     function handlePointerOut(event) {
-      if (!event.relatedTarget) setState({ active: false, label: "" });
+      if (!event.relatedTarget) updateState({ active: false, label: "" });
     }
 
     function handleCustomCursor(event) {
-      setState({
+      updateState({
         active: Boolean(event.detail?.active),
         label: event.detail?.label ?? ""
       });
@@ -139,7 +150,7 @@ export default function CustomCursor() {
 
   return (
     <div className={state.active ? "custom-cursor is-active" : "custom-cursor"} aria-hidden="true">
-      {Array.from({ length: 30 }, (_, index) => (
+      {Array.from({ length: TRAIL_POINTS }, (_, index) => (
         <div
           key={index}
           ref={(element) => {

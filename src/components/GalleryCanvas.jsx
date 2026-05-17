@@ -9,8 +9,9 @@ const GalleryScene = React.lazy(() => import("../scene/GalleryScene"));
 export default function GalleryCanvas() {
   return (
     <Canvas
-      shadows="soft"
-      dpr={[1, 1.5]}
+      frameloop="demand"
+      shadows={false}
+      dpr={[1, 1.25]}
       performance={{ min: 0.5 }}
       gl={{
         antialias: false,

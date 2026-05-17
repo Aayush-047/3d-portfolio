@@ -1,21 +1,19 @@
 // Edit this array to change hallway sections, labels, content, colors, or wall placement.
 // side controls which hallway wall the frame appears on: "left" or "right".
+import { exhibitLayout } from "./exhibitLayout";
+
 export const exhibits = [
   {
-    id: "who-am-i",
+    ...exhibitLayout[0],
     title: "Who Am I",
-    side: "left",
-    position: [-5.85, 2.42, -3],
     color: "#d1a34f",
     variant: "about",
     italicTitle: true,
     body: "I'm a software engineer based in Bengaluru with 2+ years of experience building production-grade applications across fintech, fleet management, and ed-tech domains. I specialize in React, TypeScript, and Node.js, and care deeply about reducing latency, eliminating redundant work, and writing code that scales.\n\nI believe the best engineering is invisible — users shouldn't notice the work, they should just feel the speed, the smoothness, the reliability. That obsession with craft is what drives me to dig deeper than the ticket, question the architecture, and never ship something I wouldn't be proud to maintain."
   },
   {
-    id: "skills",
+    ...exhibitLayout[1],
     title: "Skills",
-    side: "right",
-    position: [5.85, 2.42, -6],
     color: "#c8a96a",
     variant: "skills",
     italicTitle: true,
@@ -43,12 +41,10 @@ export const exhibits = [
     ]
   },
   {
-    id: "reach-vantage",
+    ...exhibitLayout[2],
     title: "Reach Vantage",
     role: "Software Engineer",
     period: "Nov 2024 — Present",
-    side: "left",
-    position: [-5.85, 2.42, -12],
     color: "#d1a34f",
     variant: "experience",
     bullets: [
@@ -61,12 +57,10 @@ export const exhibits = [
     ]
   },
   {
-    id: "thoughtclan",
+    ...exhibitLayout[3],
     title: "ThoughtClan",
     role: "Software Engineer",
     period: "Jul 2023 — Oct 2024",
-    side: "right",
-    position: [5.85, 2.42, -18],
     color: "#d1a34f",
     variant: "experience",
     bullets: [
@@ -79,10 +73,8 @@ export const exhibits = [
     ]
   },
   {
-    id: "myfinfi",
+    ...exhibitLayout[4],
     title: "Early Work",
-    side: "left",
-    position: [-5.85, 2.42, -24],
     color: "#d1a34f",
     variant: "compactExperience",
     sections: [

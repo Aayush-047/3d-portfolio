@@ -1,31 +1,29 @@
-import React, { useState } from "react";
-import { Text } from "@react-three/drei";
-import { CURSOR_EVENT } from "../components/CustomCursor";
+import React, { useState } from 'react';
+import { Text } from '@react-three/drei';
+import { CURSOR_EVENT } from '../components/CustomCursor';
 
 const CONTENT_Z = 0.11;
 const ART_Z = 0.075;
 const PLAQUE_WIDTH = 2.08;
 const PLAQUE_HEIGHT = 2.72;
-const PLAQUE_GOLD = "#d5ad5c";
-const PLAQUE_DARK_GOLD = "#9a6f28";
-const PLAQUE_INK = "#201b15";
-const PLAQUE_BODY = "#201812";
-const PLAQUE_MUTED = "#6f542a";
+const PLAQUE_GOLD = '#d5ad5c';
+const PLAQUE_DARK_GOLD = '#9a6f28';
+const PLAQUE_INK = '#201b15';
+const PLAQUE_BODY = '#201812';
+const PLAQUE_MUTED = '#6f542a';
 const CONTENT_LEFT = -0.62;
 const CONTENT_WIDTH = 1.34;
 
-function PaperPanel({ position = [0, 0], scale = [1, 1], color = "#fff0cf", opacity = 0.22 }) {
+function PaperPanel({ position = [0, 0], scale = [1, 1], color = '#fff0cf', opacity = 0.22 }) {
   return (
     <mesh position={[position[0], position[1], CONTENT_Z + 0.018]}>
       <boxGeometry args={[scale[0], scale[1], 0.012]} />
-      <meshPhysicalMaterial
+      <meshStandardMaterial
         color={color}
         transparent
         opacity={opacity}
         roughness={0.32}
         metalness={0}
-        clearcoat={0.8}
-        clearcoatRoughness={0.26}
         depthWrite={false}
       />
     </mesh>
@@ -42,32 +40,24 @@ function FramedArtwork({ accent, hovered = false }) {
 
       <mesh position={[0, 0, -0.035]}>
         <boxGeometry args={[PLAQUE_WIDTH, PLAQUE_HEIGHT, 0.075]} />
-        <meshPhysicalMaterial
+        <meshStandardMaterial
           color="#f8edd6"
           transparent
           opacity={0.48}
           roughness={0.34}
           metalness={0}
-          transmission={0.22}
-          thickness={0.22}
-          clearcoat={1}
-          clearcoatRoughness={0.24}
           envMapIntensity={0.42}
         />
       </mesh>
 
       <mesh position={[0, 0, 0.01]}>
         <boxGeometry args={[PLAQUE_WIDTH - 0.12, PLAQUE_HEIGHT - 0.12, 0.018]} />
-        <meshPhysicalMaterial
+        <meshStandardMaterial
           color="#fff5df"
           transparent
           opacity={0.28}
           roughness={0.3}
           metalness={0}
-          transmission={0.2}
-          thickness={0.08}
-          clearcoat={1}
-          clearcoatRoughness={0.22}
           envMapIntensity={0.38}
         />
       </mesh>
@@ -96,26 +86,46 @@ function FramedArtwork({ accent, hovered = false }) {
 
       <mesh position={[0, PLAQUE_HEIGHT / 2 - 0.12, 0.07]}>
         <boxGeometry args={[PLAQUE_WIDTH - 0.34, 0.018, 0.01]} />
-        <meshStandardMaterial color={hovered ? accent : PLAQUE_GOLD} roughness={0.2} metalness={0.72} envMapIntensity={0.46} />
+        <meshStandardMaterial
+          color={hovered ? accent : PLAQUE_GOLD}
+          roughness={0.2}
+          metalness={0.72}
+          envMapIntensity={0.46}
+        />
       </mesh>
       <mesh position={[0, -PLAQUE_HEIGHT / 2 + 0.12, 0.07]}>
         <boxGeometry args={[PLAQUE_WIDTH - 0.34, 0.018, 0.01]} />
-        <meshStandardMaterial color={PLAQUE_GOLD} roughness={0.22} metalness={0.66} envMapIntensity={0.4} />
+        <meshStandardMaterial
+          color={PLAQUE_GOLD}
+          roughness={0.22}
+          metalness={0.66}
+          envMapIntensity={0.4}
+        />
       </mesh>
       <mesh position={[-PLAQUE_WIDTH / 2 + 0.12, 0, 0.07]}>
         <boxGeometry args={[0.018, PLAQUE_HEIGHT - 0.34, 0.01]} />
-        <meshStandardMaterial color={PLAQUE_GOLD} roughness={0.22} metalness={0.66} envMapIntensity={0.4} />
+        <meshStandardMaterial
+          color={PLAQUE_GOLD}
+          roughness={0.22}
+          metalness={0.66}
+          envMapIntensity={0.4}
+        />
       </mesh>
       <mesh position={[PLAQUE_WIDTH / 2 - 0.12, 0, 0.07]}>
         <boxGeometry args={[0.018, PLAQUE_HEIGHT - 0.34, 0.01]} />
-        <meshStandardMaterial color={PLAQUE_GOLD} roughness={0.22} metalness={0.66} envMapIntensity={0.4} />
+        <meshStandardMaterial
+          color={PLAQUE_GOLD}
+          roughness={0.22}
+          metalness={0.66}
+          envMapIntensity={0.4}
+        />
       </mesh>
 
       {[
         [-0.75, PLAQUE_HEIGHT / 2 - 0.38, 1, -1],
         [0.75, PLAQUE_HEIGHT / 2 - 0.38, -1, -1],
         [-0.75, -PLAQUE_HEIGHT / 2 + 0.38, 1, 1],
-        [0.75, -PLAQUE_HEIGHT / 2 + 0.38, -1, 1]
+        [0.75, -PLAQUE_HEIGHT / 2 + 0.38, -1, 1],
       ].map(([x, y, xDir, yDir]) => (
         <group key={`corner-${x}-${y}`}>
           <mesh position={[x + xDir * 0.11, y, 0.082]}>
@@ -133,16 +143,21 @@ function FramedArtwork({ accent, hovered = false }) {
         [-0.84, PLAQUE_HEIGHT / 2 - 0.23],
         [0.84, PLAQUE_HEIGHT / 2 - 0.23],
         [-0.84, -PLAQUE_HEIGHT / 2 + 0.23],
-        [0.84, -PLAQUE_HEIGHT / 2 + 0.23]
+        [0.84, -PLAQUE_HEIGHT / 2 + 0.23],
       ].map(([x, y]) => (
         <group key={`mount-${x}-${y}`} position={[x, y, 0.084]} rotation={[Math.PI / 2, 0, 0]}>
           <mesh position={[0.006, -0.006, -0.006]}>
-            <cylinderGeometry args={[0.034, 0.034, 0.006, 28]} />
+            <cylinderGeometry args={[0.034, 0.034, 0.006, 18]} />
             <meshBasicMaterial color="#1f1710" transparent opacity={0.18} depthWrite={false} />
           </mesh>
           <mesh>
-            <cylinderGeometry args={[0.026, 0.026, 0.012, 28]} />
-            <meshStandardMaterial color="#21170f" roughness={0.34} metalness={0.18} envMapIntensity={0.32} />
+            <cylinderGeometry args={[0.026, 0.026, 0.012, 18]} />
+            <meshStandardMaterial
+              color="#21170f"
+              roughness={0.34}
+              metalness={0.18}
+              envMapIntensity={0.32}
+            />
           </mesh>
         </group>
       ))}
@@ -160,10 +175,10 @@ function Label({
   position,
   fontSize = 0.1,
   maxWidth = 1,
-  color = "#292524",
+  color = '#292524',
   lineHeight = 1.04,
-  anchorY = "middle",
-  fontWeight = 500
+  anchorY = 'middle',
+  fontWeight = 500,
 }) {
   return (
     <Text
@@ -206,14 +221,7 @@ function Chip({ label, position, width, fontSize = 0.046, accent }) {
   );
 }
 
-function ChipRow({
-  items,
-  startX,
-  startY,
-  maxWidth = CONTENT_WIDTH,
-  compact = false,
-  accent
-}) {
+function ChipRow({ items, startX, startY, maxWidth = CONTENT_WIDTH, compact = false, accent }) {
   let cursorX = startX;
   let cursorY = startY;
 
@@ -274,7 +282,6 @@ function AboutContent({ exhibit }) {
         anchorY="middle"
         color={exhibit.color || PLAQUE_GOLD}
         fontWeight={850}
-        fontStyle={exhibit.italicTitle ? "italic" : "normal"}
       >
         {exhibit.title}
       </Text>
@@ -306,7 +313,6 @@ function SkillsContent({ exhibit }) {
         anchorY="middle"
         color={exhibit.color || PLAQUE_GOLD}
         fontWeight={850}
-        fontStyle={exhibit.italicTitle ? "italic" : "normal"}
       >
         {exhibit.title}
       </Text>
@@ -335,7 +341,7 @@ function SkillsContent({ exhibit }) {
               fontWeight={620}
               anchorY="top"
             >
-              {group.items.join("  ")}
+              {group.items.join('  ')}
             </Label>
           </group>
         );
@@ -382,10 +388,22 @@ function BulletList({ items, startY, gap = 0.142, fontSize = 0.042 }) {
 function ExhibitMeta({ exhibit, y, color = PLAQUE_MUTED }) {
   return (
     <group>
-      <Label position={[CONTENT_LEFT, y]} fontSize={0.059} maxWidth={CONTENT_WIDTH} color={color} fontWeight={900}>
+      <Label
+        position={[CONTENT_LEFT, y]}
+        fontSize={0.059}
+        maxWidth={CONTENT_WIDTH}
+        color={color}
+        fontWeight={900}
+      >
         {exhibit.role}
       </Label>
-      <Label position={[CONTENT_LEFT, y - 0.13]} fontSize={0.043} maxWidth={CONTENT_WIDTH} color={color} fontWeight={800}>
+      <Label
+        position={[CONTENT_LEFT, y - 0.13]}
+        fontSize={0.043}
+        maxWidth={CONTENT_WIDTH}
+        color={color}
+        fontWeight={800}
+      >
         {exhibit.period}
       </Label>
     </group>
@@ -393,7 +411,7 @@ function ExhibitMeta({ exhibit, y, color = PLAQUE_MUTED }) {
 }
 
 function ExperienceContent({ exhibit }) {
-  const isPrimaryExperience = exhibit.id === "reach-vantage" || exhibit.id === "thoughtclan";
+  const isPrimaryExperience = exhibit.id === 'reach-vantage' || exhibit.id === 'thoughtclan';
 
   return (
     <>
@@ -407,14 +425,17 @@ function ExperienceContent({ exhibit }) {
           anchorY="middle"
           color={exhibit.color || PLAQUE_GOLD}
           fontWeight={850}
-          fontStyle="italic"
         >
           {exhibit.title}
         </Text>
       ) : (
         <FrameTitle title={exhibit.title} accent={exhibit.color} />
       )}
-      <ExhibitMeta exhibit={exhibit} y={0.52} color={isPrimaryExperience ? "#4a2f16" : PLAQUE_MUTED} />
+      <ExhibitMeta
+        exhibit={exhibit}
+        y={0.52}
+        color={isPrimaryExperience ? '#4a2f16' : PLAQUE_MUTED}
+      />
       <BulletList
         items={exhibit.bullets}
         startY={0.2}
@@ -452,7 +473,6 @@ function CompactExperienceContent({ exhibit }) {
         anchorY="middle"
         color={exhibit.color || PLAQUE_GOLD}
         fontWeight={850}
-        fontStyle="italic"
       >
         {exhibit.title}
       </Text>
@@ -485,9 +505,9 @@ function CompactExperienceContent({ exhibit }) {
 }
 
 function ExhibitContent({ exhibit }) {
-  if (exhibit.variant === "about") return <AboutContent exhibit={exhibit} />;
-  if (exhibit.variant === "skills") return <SkillsContent exhibit={exhibit} />;
-  if (exhibit.variant === "compactExperience") {
+  if (exhibit.variant === 'about') return <AboutContent exhibit={exhibit} />;
+  if (exhibit.variant === 'skills') return <SkillsContent exhibit={exhibit} />;
+  if (exhibit.variant === 'compactExperience') {
     return <CompactExperienceContent exhibit={exhibit} />;
   }
 
@@ -495,20 +515,22 @@ function ExhibitContent({ exhibit }) {
 }
 
 export default function ExhibitFrame({ exhibit }) {
-  const isLeft = exhibit.side === "left";
+  const isLeft = exhibit.side === 'left';
   const rotationY = isLeft ? Math.PI / 2 : -Math.PI / 2;
   const [hovered, setHovered] = useState(false);
 
   function handlePointerOver(event) {
     event.stopPropagation();
     setHovered(true);
-    window.dispatchEvent(new CustomEvent(CURSOR_EVENT, { detail: { active: true, label: "View" } }));
+    window.dispatchEvent(
+      new CustomEvent(CURSOR_EVENT, { detail: { active: true, label: 'View' } })
+    );
   }
 
   function handlePointerOut(event) {
     event.stopPropagation();
     setHovered(false);
-    window.dispatchEvent(new CustomEvent(CURSOR_EVENT, { detail: { active: false, label: "" } }));
+    window.dispatchEvent(new CustomEvent(CURSOR_EVENT, { detail: { active: false, label: '' } }));
   }
 
   return (

@@ -13,6 +13,9 @@
 /*.webp
   Cache-Control: public, max-age=604800
 
+/*.avif
+  Cache-Control: public, max-age=604800
+
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
 

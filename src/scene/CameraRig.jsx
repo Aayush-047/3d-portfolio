@@ -1,86 +1,13 @@
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import * as THREE from "three";
-import { exhibits } from "../data/exhibits";
-
-gsap.registerPlugin(ScrollTrigger);
-
-export const CAMERA_NAV_JUMP_EVENT = "portfolio-camera-nav-jump";
-
-// Tune scroll pacing here. Larger values give the motion more scroll distance.
-const CAMERA_TIMING = {
-  entranceApproachDuration: 4.2,
-  hallwayEntryDuration: 3.2,
-  hallwayTravelDuration: 2.3,
-  exhibitFocusDuration: 1.8,
-  exhibitHoldDuration: 1.8,
-  exhibitZoomOutDuration: 1.75,
-  finalAtriumRevealDuration: 3.8
-};
-
-// Debug/tune smoothness here:
-// positionLerpFactor controls camera glide. Lower = floatier, higher = tighter.
-// lookTargetLerpFactor controls rotation softness. Lower = softer head turns.
-// scrollScrub controls ScrollTrigger smoothing. Higher = more delayed cinematic scroll.
-// zoomSpeed, turnSpeed, and holdDuration scale the exhibit segment durations below.
-const CAMERA_SMOOTHING = {
-  positionLerpFactor: 3.35,
-  lookTargetLerpFactor: 2.35,
-  scrollScrub: 2.15,
-  zoomSpeed: 1.2,
-  turnSpeed: 1.18,
-  holdDuration: CAMERA_TIMING.exhibitHoldDuration
-};
-
-// Tune first-person feel here without touching scene geometry.
-const CAMERA_FEEL = {
-  eyeHeight: 2.25,
-  focusHeight: 2.55,
-  zoomDistance: 2.65,
-  zoomBackOffset: 0.05,
-  rotationAngle: 30,
-  centerAisleX: 0,
-  atriumZ: -50
-};
-
-const RESPONSIVE_CAMERA_FEEL = {
-  desktop: {
-    zoomDistance: 2.65,
-    zoomBackOffset: 0.05
-  },
-  tablet: {
-    zoomDistance: 3.45,
-    zoomBackOffset: 0.82
-  },
-  mobile: {
-    zoomDistance: 4.15,
-    zoomBackOffset: 1.18
-  }
-};
-
-function getResponsiveCameraFeel() {
-  if (typeof window === "undefined") return RESPONSIVE_CAMERA_FEEL.desktop;
-
-  const width = window.innerWidth;
-
-  if (width <= 640) return RESPONSIVE_CAMERA_FEEL.mobile;
-  if (width <= 1024) return RESPONSIVE_CAMERA_FEEL.tablet;
-
-  return RESPONSIVE_CAMERA_FEEL.desktop;
-}
-
-function getCameraViewportKey() {
-  if (typeof window === "undefined") return "desktop";
-
-  const width = window.innerWidth;
-
-  if (width <= 640) return "mobile";
-  if (width <= 1024) return "tablet";
-
-  return "desktop";
-}
+import {
+  CAMERA_NAV_JUMP_EVENT,
+  CAMERA_SMOOTHING,
+  RESPONSIVE_CAMERA_FEEL,
+  createCameraWaypoints,
+  getCameraViewportKey
+} from "./cameraPath";
 
 function toState(position, target) {
   return {
@@ -93,154 +20,99 @@ function toState(position, target) {
   };
 }
 
-function addCameraSegment(timeline, cameraState, waypoint) {
-  timeline.to(cameraState, {
-    ...toState(waypoint.position, waypoint.target),
-    duration: waypoint.duration,
-    ease: waypoint.ease ?? "power2.inOut"
-  });
+function copyState(source, target) {
+  target.px = source.px;
+  target.py = source.py;
+  target.pz = source.pz;
+  target.tx = source.tx;
+  target.ty = source.ty;
+  target.tz = source.tz;
 }
 
-function softTurnTarget(exhibit, cameraZ) {
-  const [frameX, frameY, frameZ] = exhibit.position;
-  const side = exhibit.side === "left" ? -1 : 1;
-  const zDistance = Math.max(Math.abs(cameraZ - frameZ), 1.4);
-  const turnRadians = THREE.MathUtils.degToRad(CAMERA_FEEL.rotationAngle);
-  const softX = Math.min(Math.abs(frameX), Math.tan(turnRadians) * zDistance);
+function easeProgress(progress, ease) {
+  const t = THREE.MathUtils.clamp(progress, 0, 1);
 
-  return [softX * side, frameY, frameZ];
+  if (ease === "sine.inOut") {
+    return -(Math.cos(Math.PI * t) - 1) / 2;
+  }
+
+  return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 }
 
-function createExhibitSegments(exhibit, index, cameraFeel = CAMERA_FEEL) {
-  const [frameX, frameY, frameZ] = exhibit.position;
-  const side = exhibit.side === "left" ? -1 : 1;
-  const focusX = frameX - side * cameraFeel.zoomDistance;
-  const focusZ = frameZ + cameraFeel.zoomBackOffset;
-  const nextTravelTargetZ = Math.max(frameZ - 8, CAMERA_FEEL.atriumZ);
-
-  return [
-    {
-      // 4. exhibit focus: approach from the center aisle and begin a natural head turn.
-      label: `${exhibit.id}-approach`,
-      position: [CAMERA_FEEL.centerAisleX, CAMERA_FEEL.eyeHeight, frameZ + 1.8],
-      target: softTurnTarget(exhibit, frameZ + 1.8),
-      duration:
-        index === 0
-          ? CAMERA_TIMING.hallwayTravelDuration * 1.1
-          : CAMERA_TIMING.hallwayTravelDuration
-    },
-    {
-      // 4. exhibit focus: finish the turn toward the frame before moving closer.
-      label: `${exhibit.id}-turn-to-frame`,
-      position: [CAMERA_FEEL.centerAisleX, CAMERA_FEEL.eyeHeight, frameZ + 0.45],
-      target: [frameX, frameY, frameZ],
-      duration: CAMERA_TIMING.exhibitFocusDuration * CAMERA_SMOOTHING.turnSpeed
-    },
-    {
-      // 5. exhibit zoom/hold: responsive zoom distance keeps mobile/tablet farther back.
-      label: `${exhibit.id}-zoom-in`,
-      position: [focusX, CAMERA_FEEL.focusHeight, focusZ],
-      target: [frameX, frameY, frameZ],
-      duration: CAMERA_TIMING.exhibitFocusDuration * CAMERA_SMOOTHING.zoomSpeed
-    },
-    {
-      // 5. exhibit zoom/hold: hold duration controls readability time.
-      label: `${exhibit.id}-read-hold`,
-      position: [focusX, CAMERA_FEEL.focusHeight, focusZ],
-      target: [frameX, frameY, frameZ],
-      duration: CAMERA_SMOOTHING.holdDuration,
-      ease: "sine.inOut"
-    },
-    {
-      // 6. exhibit zoom-out: return softly to the center aisle.
-      label: `${exhibit.id}-zoom-out`,
-      position: [CAMERA_FEEL.centerAisleX, CAMERA_FEEL.eyeHeight, frameZ - 1.4],
-      target: [CAMERA_FEEL.centerAisleX, 2.25, nextTravelTargetZ],
-      duration: CAMERA_TIMING.exhibitZoomOutDuration * CAMERA_SMOOTHING.zoomSpeed
-    }
-  ];
-}
-
-function createCameraWaypoints(cameraFeel = getResponsiveCameraFeel()) {
-  return [
-    {
-      label: "outside-start",
-      position: [0, 3.25, 14.8],
-      target: [0, 3.55, 4.0],
-      duration: 0
-    },
-    {
-      // 1. entrance approach: slow push toward the exterior Hero/Intro area.
-      label: "entrance-approach",
-      position: [0, 2.8, 9.1],
-      target: [0, 3.0, 3.2],
-      duration: CAMERA_TIMING.entranceApproachDuration
-    },
-    {
-      // 2. hallway entry: pass through the gate without snapping rotation.
-      label: "hallway-entry",
-      position: [0, CAMERA_FEEL.eyeHeight, 8.2],
-      target: [0, 2.2, -8],
-      duration: CAMERA_TIMING.hallwayEntryDuration
-    },
-    {
-      // 3. hallway establishing movement: look down the corridor before frames take focus.
-      label: "hallway-establish",
-      position: [0, CAMERA_FEEL.eyeHeight, 6.4],
-      target: [0, 2.2, -42],
-      duration: CAMERA_TIMING.hallwayTravelDuration
-    },
-    ...exhibits.flatMap((exhibit, index) => createExhibitSegments(exhibit, index, cameraFeel)),
-    {
-      // 7. final contact reveal: approach the end wall without passing through it.
-      label: "atrium-reveal",
-      position: [0, 2.45, -29],
-      target: [0, 2.45, -42],
-      duration: CAMERA_TIMING.finalAtriumRevealDuration
-    },
-    {
-      // 9. settle close enough for the wall-mounted contact card to read.
-      label: "atrium-settle",
-      position: [0, 2.55, -35.4],
-      target: [0, 2.45, -42],
-      duration: CAMERA_TIMING.finalAtriumRevealDuration * 0.65
-    }
-  ];
-}
-
-export function getCameraNavTargets() {
-  const waypoints = createCameraWaypoints();
-  const timedWaypoints = waypoints.slice(1);
-  const totalDuration = timedWaypoints.reduce((sum, waypoint) => sum + waypoint.duration, 0);
-  const targets = {
-    home: 0,
-    contact: 1
-  };
+function buildTimeline(waypoints) {
+  const segments = [];
   let elapsed = 0;
+  let previous = toState(waypoints[0].position, waypoints[0].target);
 
-  timedWaypoints.forEach((waypoint) => {
-    if (waypoint.label.endsWith("-read-hold")) {
-      const exhibitId = waypoint.label.replace("-read-hold", "");
-      targets[exhibitId] = (elapsed + waypoint.duration * 0.5) / totalDuration;
-    }
-    elapsed += waypoint.duration;
+  waypoints.slice(1).forEach((waypoint) => {
+    const duration = Math.max(waypoint.duration, 0.0001);
+    const next = toState(waypoint.position, waypoint.target);
+
+    segments.push({
+      from: previous,
+      to: next,
+      start: elapsed,
+      end: elapsed + duration,
+      duration,
+      ease: waypoint.ease ?? "power2.inOut"
+    });
+
+    previous = next;
+    elapsed += duration;
   });
 
-  return targets;
+  return {
+    first: toState(waypoints[0].position, waypoints[0].target),
+    last: previous,
+    segments,
+    totalDuration: elapsed
+  };
+}
+
+function sampleTimeline(timeline, progress, output) {
+  const normalizedProgress = THREE.MathUtils.clamp(progress, 0, 1);
+
+  if (!timeline.segments.length || normalizedProgress <= 0) {
+    copyState(timeline.first, output);
+    return;
+  }
+
+  if (normalizedProgress >= 1) {
+    copyState(timeline.last, output);
+    return;
+  }
+
+  const elapsed = normalizedProgress * timeline.totalDuration;
+  const segment =
+    timeline.segments.find((item) => elapsed >= item.start && elapsed <= item.end) ??
+    timeline.segments[timeline.segments.length - 1];
+  const t = easeProgress((elapsed - segment.start) / segment.duration, segment.ease);
+
+  output.px = THREE.MathUtils.lerp(segment.from.px, segment.to.px, t);
+  output.py = THREE.MathUtils.lerp(segment.from.py, segment.to.py, t);
+  output.pz = THREE.MathUtils.lerp(segment.from.pz, segment.to.pz, t);
+  output.tx = THREE.MathUtils.lerp(segment.from.tx, segment.to.tx, t);
+  output.ty = THREE.MathUtils.lerp(segment.from.ty, segment.to.ty, t);
+  output.tz = THREE.MathUtils.lerp(segment.from.tz, segment.to.tz, t);
+}
+
+function getScrollProgress() {
+  if (typeof document === "undefined") return 0;
+
+  const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  return maxScroll > 0 ? window.scrollY / maxScroll : 0;
 }
 
 export default function CameraRig() {
-  const { camera } = useThree();
+  const { camera, invalidate } = useThree();
   const [viewportKey, setViewportKey] = useState(getCameraViewportKey);
   const waypoints = useMemo(
     () => createCameraWaypoints(RESPONSIVE_CAMERA_FEEL[viewportKey]),
     [viewportKey]
   );
+  const timeline = useMemo(() => buildTimeline(waypoints), [waypoints]);
 
-  // ScrollTrigger writes only to this target state. The real camera never snaps to it.
-  const targetState = useRef(toState(waypoints[0].position, waypoints[0].target));
-
-  // useFrame smooths these actual values toward targetState every frame.
+  const targetState = useRef({ ...timeline.first });
   const actualPosition = useRef(new THREE.Vector3(...waypoints[0].position));
   const actualLookTarget = useRef(new THREE.Vector3(...waypoints[0].target));
   const targetPosition = useRef(new THREE.Vector3(...waypoints[0].position));
@@ -268,77 +140,68 @@ export default function CameraRig() {
   }, []);
 
   useEffect(() => {
-    const first = waypoints[0];
+    let frame = 0;
 
-    camera.position.set(...first.position);
-    actualPosition.current.set(...first.position);
-    actualLookTarget.current.set(...first.target);
-    camera.lookAt(actualLookTarget.current);
-
-    const timeline = gsap.timeline({
-      defaults: {
-        overwrite: "auto",
-        ease: "sine.inOut"
-      },
-      scrollTrigger: {
-        trigger: document.body,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: CAMERA_SMOOTHING.scrollScrub
-      }
-    });
-
-    waypoints.slice(1).forEach((waypoint) => {
-      addCameraSegment(timeline, targetState.current, waypoint);
-    });
-
-    function syncCameraToTimelineProgress(progress) {
-      const clampedProgress = THREE.MathUtils.clamp(progress, 0, 1);
-      const scrubTween = timeline.scrollTrigger?.getTween?.();
-
-      scrubTween?.pause();
-      timeline.totalProgress(clampedProgress, false);
-
+    function syncVectorsFromTarget(snap = false) {
       const state = targetState.current;
+
       targetPosition.current.set(state.px, state.py, state.pz);
       targetLookAt.current.set(state.tx, state.ty, state.tz);
-      actualPosition.current.copy(targetPosition.current);
-      actualLookTarget.current.copy(targetLookAt.current);
-      camera.position.copy(actualPosition.current);
-      camera.lookAt(actualLookTarget.current);
+
+      if (snap) {
+        actualPosition.current.copy(targetPosition.current);
+        actualLookTarget.current.copy(targetLookAt.current);
+        camera.position.copy(actualPosition.current);
+        camera.lookAt(actualLookTarget.current);
+      }
+
+      invalidate();
+    }
+
+    function applyProgress(progress, snap = false) {
+      sampleTimeline(timeline, progress, targetState.current);
+      syncVectorsFromTarget(snap);
+    }
+
+    function requestScrollUpdate() {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => applyProgress(getScrollProgress()));
     }
 
     function handleNavJump(event) {
-      syncCameraToTimelineProgress(event.detail?.progress ?? 0);
+      applyProgress(event.detail?.progress ?? 0, true);
     }
 
+    applyProgress(getScrollProgress(), true);
+
+    window.addEventListener("scroll", requestScrollUpdate, { passive: true });
+    window.addEventListener("resize", requestScrollUpdate);
     window.addEventListener(CAMERA_NAV_JUMP_EVENT, handleNavJump);
 
     return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", requestScrollUpdate);
+      window.removeEventListener("resize", requestScrollUpdate);
       window.removeEventListener(CAMERA_NAV_JUMP_EVENT, handleNavJump);
-      timeline.scrollTrigger?.kill();
-      timeline.kill();
     };
-  }, [camera, waypoints]);
+  }, [camera, invalidate, timeline]);
 
   useFrame((_, delta) => {
-    const state = targetState.current;
+    const positionAlpha = 1 - Math.exp(-CAMERA_SMOOTHING.positionLerpFactor * delta);
+    const targetAlpha = 1 - Math.exp(-CAMERA_SMOOTHING.lookTargetLerpFactor * delta);
 
-    targetPosition.current.set(state.px, state.py, state.pz);
-    targetLookAt.current.set(state.tx, state.ty, state.tz);
-
-    // Frame-rate independent damping. Stop scrolling anywhere and the camera settles smoothly.
-    actualPosition.current.lerp(
-      targetPosition.current,
-      1 - Math.exp(-CAMERA_SMOOTHING.positionLerpFactor * delta)
-    );
-    actualLookTarget.current.lerp(
-      targetLookAt.current,
-      1 - Math.exp(-CAMERA_SMOOTHING.lookTargetLerpFactor * delta)
-    );
+    actualPosition.current.lerp(targetPosition.current, positionAlpha);
+    actualLookTarget.current.lerp(targetLookAt.current, targetAlpha);
 
     camera.position.copy(actualPosition.current);
     camera.lookAt(actualLookTarget.current);
+
+    const positionSettled = actualPosition.current.distanceToSquared(targetPosition.current) < 0.000001;
+    const targetSettled = actualLookTarget.current.distanceToSquared(targetLookAt.current) < 0.000001;
+
+    if (!positionSettled || !targetSettled) {
+      invalidate();
+    }
   });
 
   return null;
