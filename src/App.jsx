@@ -23,13 +23,13 @@ function useDeferredGalleryLoad() {
     }
 
     function handleScroll() {
-      if (window.scrollY > window.innerHeight * 0.2) load();
+      if (window.scrollY > window.innerHeight * 0.3) load();
     }
 
     if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(load, { timeout: 2400 });
+      idleId = window.requestIdleCallback(load, { timeout: 5000 });
     } else {
-      timeoutId = window.setTimeout(load, 1800);
+      timeoutId = window.setTimeout(load, 4200);
     }
 
     window.addEventListener("scroll", handleScroll, { passive: true });

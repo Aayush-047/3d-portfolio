@@ -70,9 +70,9 @@ function useDeferredSculptureLoad(progress) {
     }
 
     if ("requestIdleCallback" in window) {
-      idleId = window.requestIdleCallback(load, { timeout: 1400 });
+      idleId = window.requestIdleCallback(load, { timeout: 2600 });
     } else {
-      timeoutId = window.setTimeout(load, 900);
+      timeoutId = window.setTimeout(load, 2000);
     }
 
     return () => {
@@ -84,7 +84,7 @@ function useDeferredSculptureLoad(progress) {
   return loadSculpture;
 }
 
-function StaticPortalBackground({ progress }) {
+const StaticPortalBackground = React.memo(({ progress }) => {
   const scale = 1 + progress * 0.075;
   const opacity = 1 - smoothstep(progress, 0.76, 1);
   const glow = smoothstep(progress, 0.34, 0.78);
@@ -104,9 +104,9 @@ function StaticPortalBackground({ progress }) {
       />
     </div>
   );
-}
+});
 
-function IntroCaption({ progress }) {
+const IntroCaption = React.memo(({ progress }) => {
   const opacity = 1 - smoothstep(progress, 0.58, 0.92);
 
   return (
@@ -134,9 +134,9 @@ function IntroCaption({ progress }) {
       </button>
     </div>
   );
-}
+});
 
-function RisingFog({ progress }) {
+const RisingFog = React.memo(({ progress }) => {
   const rise = smoothstep(progress, 0.24, 0.9);
   const opacity = 0.22 + rise * 0.62;
 
@@ -152,13 +152,13 @@ function RisingFog({ progress }) {
       <div className="intro-fog__bank intro-fog__bank--two" />
     </div>
   );
-}
+});
 
-function PortalTransition({ progress }) {
+const PortalTransition = React.memo(({ progress }) => {
   const opacity = smoothstep(progress, 0.72, 1);
 
   return <div className="intro-transition" style={{ opacity }} />;
-}
+});
 
 export default function IntroScene() {
   const progress = useIntroProgress();
